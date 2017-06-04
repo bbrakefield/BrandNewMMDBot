@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="app.css">
+    </head>
+
+<body>
+    <div class="container">
+        <div class="leftPanel">
+            <div class="album-bg" id="albumCover">
+                <div class="title-overlay">
+                    <div class="song" id="songName">
+                        unknown
+                    </div>
+                    <div class="artist" id="artistName">
+                        unknown
+                    </div>
+                </div>
+            </div>
+            <!--<div class="left-info">
+                <div class="item-container">
+                    <div class="item">
+                        <div class="item-upper">
+                            Album
+                        </div>
+                        <div class="item-lower" id="albumScrobbles">
+                            5262
+                        </div>                
+                    </div>
+                    <div class="item">
+                        <div class="item-upper">
+                            Artist
+                        </div>
+                        <div class="item-lower" id="artistScrobbles">
+                            9825
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="item-upper">
+                            Total
+                        </div>
+                        <div class="item-lower" id="totalScrobbles">
+                            5.7M
+                        </div>
+                    </div>
+                    <div class="lastitem">
+                        <div class="item-upper">
+                            Duration
+                        </div>
+                        <div class="item-lower" id="genre">
+                            6:66
+                        </div>
+                    </div>                    
+                </div>
+            </div>-->
+        </div>
+        <div class="right-panel" id="artistCover">
+            <div class="right-panel-container">
+            <div class="user-container">
+                <div class="name-panel">
+                    <h2 id="userName">arkenthera</h2>
+                </div>
+                <div class="user-avatar" id="userAvatar">
+                </div>                
+            </div>
+            <div class="user-info-panel">
+                <div class="item">
+                    <div class="item-upper">
+                        Scrobbles
+                    </div>
+                    <div class="item-lower" id="userScrobbles">
+                        469863
+                    </div>
+                </div>
+                <div class="item">
+                    <div class="item-upper">
+                        Artists
+                    </div>
+                    <div class="item-lower" id="userArtistCount">
+                        2500
+                    </div>
+                </div>
+                <div class="item">
+                    <div class="item-upper">
+                        Loved
+                    </div>
+                    <div class="item-lower" id="userFavourites">
+                        120
+                    </div>
+                </div>
+            </div>
+            <div class="previous-tracks-panel" id="pvt">
+                <div class="pvt-title">
+                    <h2>Previous Tracks</h2>
+                </div>
+            </div>
+        </div>
+        <div class="bottom-panel">
+            <div id="footerText">
+            </div>
+        </div>
+        </div>
+    </div>
+    <script>
+        if(!window.cppSongName)
+            window.cppSongName =  "im broke";
+
+        if(!window.cppArtistName)
+            window.cppArtistName = "";
+
+        if(!window.cppArtistScrobbles)
+            window.cppArtistScrobbles = -1;
+
+        if(!window.cppAlbumScrobbles)
+            window.cppAlbumScrobbles = -1;
+        
+        if(!window.cppTotalScrobbles)
+            window.cppTotalScrobbles = -1;
+        
+        if(!window.cppGenre)
+            window.cppGenre = "";
+
+        if(!window.cppUserName)
+            window.cppUserName = "";
+        
+        if(!window.cppUserAvatar)
+            window.cppUserAvatar = "avatar.webp";
+
+        if(!window.cppUserArtistCount)
+            window.cppUserArtistCount = -1;
+        
+        if(!window.cppUserScrobbles)
+            window.cppUserScrobbles = -1;
+
+        if(!window.cppUserFavourites)
+            window.cppUserFavourites = -1;
+
+        if(!window.cppAlbumCover)
+            window.cppAlbumCover = "artist_not_found.jpg"
+
+        if(!window.cppArtistCover)
+            window.cppArtistCover = "artist_not_found.jpg"
+
+        var albumCoverCount = 2;
+
+        for(var i = 0; i < albumCoverCount; i++) {
+            if(!window["prev_track_" + i + "_cover"])
+                window["prev_track_" + i + "_cover"] = "album.jpg";
+
+            if(!window["prev_track_" + i + "_text"])
+                window["prev_track_" + i + "_text"] = "broken";
+
+            createPrevTrack({ image: window["prev_track_" + i + "_cover"], text: window["prev_track_" + i + "_text"]});
+        }
+        
+        function createPrevTrack(pvtinfo) {
+            var txt = document.createElement("div");
+            txt.className = "item";
+            txt.innerHTML = "<div class=\"pvt-album-cover\" style=\"background-image: url(\'"+ pvtinfo.image+ "\')\";></div><div class\"album-text\">" + pvtinfo.text + "</div>"
+            var parent = document.getElementById('pvt');
+            parent.insertBefore(txt, parent.lastChild);
+        }
+
+        function setInfo() {
+            document.getElementById("songName").innerText = window.cppSongName;
+            document.getElementById("artistName").innerText = window.cppArtistName;
+            // document.getElementById("artistScrobbles").innerText = window.cppArtistScrobbles;
+            // document.getElementById("albumScrobbles").innerText = window.cppAlbumScrobbles;
+            // document.getElementById("totalScrobbles").innerText = window.cppTotalScrobbles;
+            // document.getElementById("genre").innerText = window.cppGenre;
+
+            document.getElementById("userName").innerText = window.cppUserName;
+            document.getElementById("userAvatar").style = "background-image: url('"+  window.cppUserAvatar + "');";
+            document.getElementById("userArtistCount").innerText = window.cppUserArtistCount;
+            document.getElementById("userScrobbles").innerText = window.cppUserScrobbles;
+            document.getElementById("userFavourites").innerText = window.cppUserFavourites;
+            document.getElementById("footerText").innerText = "http://last.fm/user/" + window.cppUserName;
+
+            document.getElementById("albumCover").style = "background-image: url('"+  window.cppAlbumCover + "');";
+            document.getElementById("artistCover").style = "background-image: url('"+  window.cppArtistCover + "');";
+        }
+        setInfo();
+    </script>
+</body>
+</html>

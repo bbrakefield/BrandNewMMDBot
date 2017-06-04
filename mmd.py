@@ -28,6 +28,10 @@ class MusicBot(discord.Client):
     async def on_ready(self):
         logger.info("Bot is ready.")
 
+
+
+    #async def cmd_np(self, message,user_mentions):
+
     # Test command
     async def cmd_test(self):
         return Response("Test response", reply=True, delete_after=5)
