@@ -1,6 +1,7 @@
 import pylast
 import time
 import os
+import logging
 from database import *
 from lastfm_spoofer import *
 
@@ -16,11 +17,12 @@ class MMDTrack:
 
 class LastFmWrapper:
     def __init__(self):
+        logging.info("Initializing Last.fm...")
         self.network = pylast.LastFMNetwork(api_key=API_KEY, api_secret=API_SECRET)
         self.utility = LastfmUtility(self)
 
     def get_user(self,user_name):
-        lastfm_user = self.network.get_user("arkenthera")
+        lastfm_user = self.network.get_user(user_name)
 
         library = lastfm_user.get_library()
         return library.get_user()
@@ -32,10 +34,12 @@ class LastFmWrapper:
             return None
 
     def get_now_playing(self,user_name):
+        logging.info("get_now_playing: ({})".format(user_name))
         try:
             np = self.get_user(user_name).get_now_playing()
             return np
         except:
+            logging.info("return get_now_playing: None")
             return None
 
     def get_user_artists_from_db(self, user_name):

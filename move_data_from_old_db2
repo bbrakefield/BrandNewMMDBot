@@ -1,0 +1,2 @@
+UPDATE user SET lastfm_user_id = (select lastfm_uname from lastfm.lastfm where discord_uid == user.id)
+ WHERE id = (select discord_uid from lastfm.lastfm where discord_uid == user.id)

@@ -17,7 +17,7 @@ download_cache = os.path.join(current_dir,'download_cache')
 def url2filename(url):
     """Return basename corresponding to url.
     >>> print(url2filename('http://example.com/path/to/file%C3%80?opt=1'))
-    fileÀ
+    file??
     >>> print(url2filename('http://example.com/slash%2fname')) # '/' in name
     Traceback (most recent call last):
     ...
@@ -81,28 +81,30 @@ class ParallelDownloader:
         return filename, (response.status, tuple(response.headers.items()))
 
     def start_downloading(self):
-        #self.session = aiohttp.ClientSession()
-        #semaphore = asyncio.Semaphore(10)
-        #download_tasks = (self.download(url, self.session, semaphore) for url in self.urls)
-        #tasks = asyncio.gather(*download_tasks)
-        #tasks.add_done_callback(self.on_downloads_complete())
         logging.info("Starting download. {} items in queue".format(len(self.urls)))
-        #asyncio.ensure_future(asyncio.gather(*download_tasks))
-        with closing(asyncio.get_event_loop()) as loop, \
-                closing(aiohttp.ClientSession()) as session:
-            semaphore = asyncio.Semaphore(5)
-            download_tasks = (self.download(url, session, semaphore) for url in self.urls)
-            tasks = asyncio.gather(*download_tasks)
-            tasks.add_done_callback(self.on_downloads_complete)
-            result = loop.run_until_complete(tasks)
+
+        self.session = aiohttp.ClientSession()
+        semaphore = asyncio.Semaphore(5)
+        download_tasks = (self.download(url, self.session, semaphore) for url in self.urls)
+        tasks = asyncio.gather(*download_tasks)
+        tasks.add_done_callback(self.on_downloads_complete)
+        asyncio.ensure_future(asyncio.gather(*download_tasks))
+
+        # with closing(asyncio.get_event_loop()) as loop, \
+        #         closing(aiohttp.ClientSession()) as session:
+        #     semaphore = asyncio.Semaphore(5)
+        #     download_tasks = (self.download(url, session, semaphore) for url in self.urls)
+        #     tasks = asyncio.gather(*download_tasks)
+        #     tasks.add_done_callback(self.on_downloads_complete)
+        #     result = loop.run_until_complete(tasks)
 
     def on_downloads_complete(self,param):
-        print("Downloads complete")
+        self.session.close()
 
         for item in self.downloaded_items:
             print("Item {} - {}".format(item.original_url, item.target_path))
 
-        self.done_callback(self.urls,self.custom_data_on_callback)
+        asyncio.ensure_future(self.done_callback(self.urls,self.custom_data_on_callback))
 
     def random_string(self,size=6, chars=string.ascii_uppercase + string.digits):
         return ''.join(random.choice(chars) for _ in range(size))

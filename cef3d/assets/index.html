@@ -18,42 +18,6 @@
                     </div>
                 </div>
             </div>
-            <!--<div class="left-info">
-                <div class="item-container">
-                    <div class="item">
-                        <div class="item-upper">
-                            Album
-                        </div>
-                        <div class="item-lower" id="albumScrobbles">
-                            5262
-                        </div>                
-                    </div>
-                    <div class="item">
-                        <div class="item-upper">
-                            Artist
-                        </div>
-                        <div class="item-lower" id="artistScrobbles">
-                            9825
-                        </div>
-                    </div>
-                    <div class="item">
-                        <div class="item-upper">
-                            Total
-                        </div>
-                        <div class="item-lower" id="totalScrobbles">
-                            5.7M
-                        </div>
-                    </div>
-                    <div class="lastitem">
-                        <div class="item-upper">
-                            Duration
-                        </div>
-                        <div class="item-lower" id="genre">
-                            6:66
-                        </div>
-                    </div>                    
-                </div>
-            </div>-->
         </div>
         <div class="right-panel" id="artistCover">
             <div class="right-panel-container">
@@ -89,12 +53,7 @@
                         120
                     </div>
                 </div>
-            </div>
-            <div class="previous-tracks-panel" id="pvt">
-                <div class="pvt-title">
-                    <h2>Previous Tracks</h2>
-                </div>
-            </div>
+            </div>            
         </div>
         <div class="bottom-panel">
             <div id="footerText">
@@ -142,25 +101,25 @@
         if(!window.cppArtistCover)
             window.cppArtistCover = "artist_not_found.jpg"
 
-        var albumCoverCount = 2;
+        // var albumCoverCount = 2;
 
-        for(var i = 0; i < albumCoverCount; i++) {
-            if(!window["prev_track_" + i + "_cover"])
-                window["prev_track_" + i + "_cover"] = "album.jpg";
+        // for(var i = 0; i < albumCoverCount; i++) {
+        //     if(!window["prev_track_" + i + "_cover"])
+        //         window["prev_track_" + i + "_cover"] = "album.jpg";
 
-            if(!window["prev_track_" + i + "_text"])
-                window["prev_track_" + i + "_text"] = "broken";
+        //     if(!window["prev_track_" + i + "_text"])
+        //         window["prev_track_" + i + "_text"] = "broken";
 
-            createPrevTrack({ image: window["prev_track_" + i + "_cover"], text: window["prev_track_" + i + "_text"]});
-        }
+        //     createPrevTrack({ image: window["prev_track_" + i + "_cover"], text: window["prev_track_" + i + "_text"]});
+        // }
         
-        function createPrevTrack(pvtinfo) {
-            var txt = document.createElement("div");
-            txt.className = "item";
-            txt.innerHTML = "<div class=\"pvt-album-cover\" style=\"background-image: url(\'"+ pvtinfo.image+ "\')\";></div><div class\"album-text\">" + pvtinfo.text + "</div>"
-            var parent = document.getElementById('pvt');
-            parent.insertBefore(txt, parent.lastChild);
-        }
+        // function createPrevTrack(pvtinfo) {
+        //     var txt = document.createElement("div");
+        //     txt.className = "item";
+        //     txt.innerHTML = "<div class=\"pvt-album-cover\" style=\"background-image: url(\'"+ pvtinfo.image+ "\')\";></div><div class\"album-text\">" + pvtinfo.text + "</div>"
+        //     var parent = document.getElementById('pvt');
+        //     parent.insertBefore(txt, parent.lastChild);
+        // }
 
         function setInfo() {
             document.getElementById("songName").innerText = window.cppSongName;

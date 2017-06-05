@@ -77,8 +77,13 @@ class LastfmUtility:
         user_playcount = lastfm_user.get_playcount()
         user_age = lastfm_user.get_age()
         user_gender = lastfm_user.get_gender()
-        loved_count = len(lastfm_user.get_loved_tracks(limit=1000))
-
+        loved_count = 0
+        try:
+            loved_tracks = lastfm_user.get_loved_tracks(limit=1000)
+            loved_count = len(loved_tracks)
+        except:
+            pass
+        
         user_registered = lastfm_user.get_unixtime_registered()
 
         if not user_registered == None:
@@ -117,7 +122,3 @@ class LastfmUtility:
         artist.bio = pylast_artist.get_bio("summary")
         artist.url = pylast_artist.get_url()
         return artist
-
-
-
-spoofer = LastfmUtility("arkenthera")

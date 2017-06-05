@@ -2,6 +2,7 @@ from database import *
 from parallel_downloader import *
 from lastfm import *
 import time
+import sys
 import subprocess
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -10,21 +11,29 @@ cef3d_exe_path = os.path.join(current_dir,'cef3d',"Cef3DHtmlRenderer.exe")
 cef3d_output_path = os.path.join(current_dir,"html_render")
 
 class NowPlayingEntry:
-    def __init__(self,lastfm_user,discord_user,title,artist,album,recent_trakcs):
+    def __init__(self,lastfm_user,discord_user,title,artist,album,recent_trakcs, channel):
         self.title = title
         self.artist = artist
         self.album = album
         self.recent_trakcs = recent_trakcs
         self.lastfm_user = lastfm_user
         self.discord_user = discord_user
+        self.channel = channel
 
 class Commands:
-    def __init__(self):
+    def __init__(self, client):
         self.lastfm = LastFmWrapper()
+        self.bot_config = None
+        self.client = client
+        try:
+            self.bot_config = BotConfig.select().get()
+        except:
+            logging.info("Error retrieving bot config")
+        
+        self.prefix = self.bot_config.command_prefix
+        
 
-    def nowplaying_download_complete(self,urls,data):
-        print("test")
-
+    async def nowplaying_download_complete(self,urls,data):
         artist_image_local = None
         album_image_local = None
 
@@ -104,12 +113,12 @@ class Commands:
             album_in_db = LastfmAlbum.select().where(LastfmAlbum.title == data.album.title).get()
 
         # Track
-        track_in_db = None
+        # track_in_db = None
 
-        try:
-            track_in_db = LastfmTrack.select().where(LastfmTrack.title == data.title, LastfmTrack.artist == artist_in_db, LastfmTrack.album == album_in_db).get()
-        except:
-            logging.info("Track not found")
+        # try:
+        #     track_in_db = LastfmTrack.select().where(LastfmTrack.title == data.title, LastfmTrack.artist == artist_in_db, LastfmTrack.album == album_in_db).get()
+        # except:
+        #     logging.info("Track not found")
 
         if not artist_in_db == None:
             artist_cover = artist_in_db.cover_image_local
@@ -171,6 +180,11 @@ class Commands:
 
         render_end_time = time.time()
         logging.info("Cef3D stage took " + str(render_end_time - render_start_time))
+
+        output_file = os.path.join(cef3d_output_path, "output.png")
+        with open(output_file, 'rb') as f:
+            await self.client.send_file(data.channel, output_file)
+            #await self.delete_message(generatingMessageProc)
 
 
     def process_track(self,track, lastfm_user,download_queue):
@@ -251,51 +265,93 @@ class Commands:
 
 
 
-    def cmd_nowplaying(self, message, user_mentions):
+    async def cmd_nowplaying(self, message, user_mentions):
         start_time = time.time()
+
+        # Possible usages
+        # 1: <prefix>nowplaying lastfm_user
+        # 2: <prefix>nowplaying @mention
+        # 3: <prefix>nowplaying
+        message_content = message.content
+        split = message_content.split('{}{} '.format(self.prefix, "np"))
+
+        user = None
+        lastfm_user = None
+
+        # If there is a mention
+        # try looking it up in the database
+        if len(user_mentions) > 0:
+            try:
+                user = User.select().where(User.id == user_mentions[0].id).get()
+            except:
+                logging.info("Could not find mentioned user in DB")
+        else:
+            # No mention, must be case 1 or 3
+            params_len = len(split)
+            if params_len != 2:
+                logging.error("Need 2 parameters. Got {}".format(params_len))
+                return None
+
+            # Case 1
+            lastfm_user_name = split[1]
+            lastfm_user = lastfm_user_name
+
+            
+            try:
+                lastfm_user = LastfmUser.select().where(LastfmUser.name == lastfm_user_name).get()
+            except:
+                logging.info("Last.fm user not found in DB")
+
+            if not lastfm_user == None:
+                try:
+                    user = User.select().where(User.lastfm_user == lastfm_user).get()
+                except:
+                    logging.info("Discord user not found in DB")
+
+        if user == None and lastfm_user == None:
+            logging.info("There is a problem with this request")
+            return None
+        
 
         lastfm_fetch_time = 0
         image_downloads_time = 0
         rendering_time = 0
 
-        lastfm_user_name = 'arkenthera'
-        try:
-            lastfm_user = LastfmUser.select().where(LastfmUser.name == lastfm_user_name).get()
-        except:
-            try:
-                lastfm_user = self.lastfm.utility.save_user_info(lastfm_user_name)
-            except:
-                logging.info("Error creating ")
-                return None
+        logging.info("nowplaying is ready to execute")
+        logging.info("User Name: {}".format(lastfm_user_name))
+        logging.info("Discord user found: {}".format(user))
+
+
 
         # Request nowplaying from Last.fm
-        try:
-            now_playing = self.lastfm.get_now_playing(lastfm_user_name)
-        except:
-            return None
+        now_playing = self.lastfm.get_now_playing(lastfm_user_name)
 
         if now_playing == None:
             return None
-        # Initialize variables
-        discord_user_avatar = "https://cdn.discordapp.com/avatars/77509464290234368/a_923ed10a1e74c3e56134298f72bfdfb3.gif?size=1024"
+        
+        discord_user_avatar = None
+        if not user == None:
+            discord_user_avatar = user.avatar_url
 
         files_to_download = []
 
-        if exists_in_cache(discord_user_avatar):
-            discord_user_avatar = get_cache_path_from_url(discord_user_avatar)
-        else:
-            files_to_download.append(discord_user_avatar)
-
+        if not discord_user_avatar == None:
+            if exists_in_cache(discord_user_avatar):
+                discord_user_avatar = get_cache_path_from_url(discord_user_avatar)
+            else:
+                files_to_download.append(discord_user_avatar)
+        
+        
         artist_in_db, album_in_db = self.process_track(now_playing,lastfm_user, files_to_download)
 
         # Recent Tracks
         recent_trakcs = self.lastfm.get_recent_trakcs(lastfm_user_name, 3)
         recent_tracks_array = []
 
-        for track in recent_trakcs:
-            rt_artist_in_db, rt_album_in_db = self.process_track(track.track, lastfm_user, files_to_download)
-            rt_track = MMDTrack(rt_artist_in_db, rt_album_in_db, track.track)
-            recent_tracks_array.append(rt_track)
+        # for track in recent_trakcs:
+        #     rt_artist_in_db, rt_album_in_db = self.process_track(track.track, lastfm_user, files_to_download)
+        #     rt_track = MMDTrack(rt_artist_in_db, rt_album_in_db, track.track)
+        #     recent_tracks_array.append(rt_track)
 
         # Gather download tasks from recent tracks
         # i.e. covers
@@ -306,21 +362,56 @@ class Commands:
         logging.info("Lastfm Fetch time: {}".format(str(lastfm_fetch_time)))
         start_time = current_time
 
-        now_playing_entry = NowPlayingEntry(lastfm_user, None, now_playing.title, artist_in_db, album_in_db, recent_tracks_array)
+        now_playing_entry = NowPlayingEntry(lastfm_user, None, now_playing.title, artist_in_db, album_in_db, recent_tracks_array, message.channel)
 
         # Start downloading if there are any download items
         if len(files_to_download) > 0:
-            logging.info("{} items in download queue".format(recent_tracks_array))
+            logging.info("{} items in download queue".format(len(files_to_download)))
 
             # Start downloading
             parallel_downloader = ParallelDownloader(files_to_download,download_cache,now_playing_entry, self.nowplaying_download_complete)
         else:
-            self.nowplaying_download_complete(None, now_playing_entry)
+            await self.nowplaying_download_complete(None, now_playing_entry)
 
-all_start = time.time()
+    def cmd_setlastfm(self, message):
+        lastfm_user_name = message
+        try:
+            lastfm_user = LastfmUser.select().where(LastfmUser.name == lastfm_user_name).get()
+        except:
+            try:
+                lastfm_user = self.lastfm.utility.save_user_info(lastfm_user_name)
+            except Exception as ex:
+                logging.info("Error creating user {}".format(lastfm_user_name))
+                print(ex)
+                pass
 
-cmd = Commands()
-cmd.cmd_nowplaying("test",[])
+    def test_commands(self):
+        message_content = sys.argv[1].strip()
 
-end_time = time.time()
-print("xTime execution: {}".format(str(end_time - all_start)))
+        command, *args = message_content.split()
+        command = command[len(self.prefix):].lower().strip()
+
+        handler = getattr(self,'cmd_%s' % command, None)
+
+        handler_args = {}
+        handler_args['message'] = sys.argv[1]
+        handler_args['user_mentions'] = []
+
+        response = handler(**handler_args)
+
+# all_start = time.time()
+
+try:
+    cmd = Commands()
+    argv_command = sys.argv[1]
+
+    if argv_command == None:
+        print("Need a command to work")
+        exit()
+    else:
+        cmd.test_commands()
+except:
+    pass
+
+# end_time = time.time()
+# print("Program execution time: {}".format(str(end_time - all_start)))

@@ -3,6 +3,7 @@ import asyncio
 import logging
 import inspect
 import sys
+from commands import *
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -25,12 +26,15 @@ class MusicBot(discord.Client):
         self.auth = token
         super().__init__()
 
+        self.commands = Commands(self)
+
     async def on_ready(self):
         logger.info("Bot is ready.")
 
 
 
-    #async def cmd_np(self, message,user_mentions):
+    async def cmd_np(self, message,user_mentions):
+        await self.commands.cmd_nowplaying(message,user_mentions)
 
     # Test command
     async def cmd_test(self):
@@ -80,8 +84,9 @@ class MusicBot(discord.Client):
                     message.channel, content,
                     expire_in=response.delete_after
                 )
-        except:
+        except Exception as ex:
             logger.error("Error handling command")
+            print(ex)
 
     async def safe_send_message(self, dest, content, *, tts=False, expire_in=0, also_delete=None, quiet=False):
         msg = None

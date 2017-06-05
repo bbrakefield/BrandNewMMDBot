@@ -97,10 +97,37 @@ class LastfmTrack(Model):
     class Meta:
         database = db
 
+class BotConfig(Model):
+    command_prefix = CharField()
+
+    class Meta:
+        database = db
+
+
+class UserConfig(Model):
+    user = ForeignKeyField(User, related_name="user_config_users")
+    chart_type = CharField()
+    chart_size = CharField()
+
+    class Meta:
+        database = db
 
 db.connect()
 
 try:
-    db.create_tables([User,LastfmUser, DiscussionAlbum, AlbumRating, LastfmTrack, LastfmAlbum, LastfmArtist, LastfmUserAlbum, LastfmUserArtist])
-except:
+    db.create_tables([
+    UserConfig
+    # BotConfig,
+    # User,
+    # LastfmUser,
+    # DiscussionAlbum,
+    # AlbumRating,
+    # LastfmTrack,
+    # LastfmAlbum,
+    # LastfmArtist,
+    # LastfmUserAlbum,
+    # LastfmUserArtist
+    ])
+except Exception as ex:
+    print(ex)
     pass
