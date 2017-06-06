@@ -226,12 +226,12 @@ class Commands:
 
         for rta in recent_trakcs_array:
             params.append(rta)
-        cef3d_proc = subprocess.Popen(params, stdout=subprocess.PIPE)
+        #cef3d_proc = subprocess.Popen(params, stdout=subprocess.PIPE)
 
-        cef3d_proc.communicate()
+        #cef3d_proc.communicate()
 
         try:
-            subprocess.run(params, timeout=6)
+            subprocess.run(params, timeout=6,stdout=subprocess.DEVNULL)
         except:
             await self.safe_send_message(
                     data.channel, "There was a problem with the request ",self.client.emoji.FeelsMetalHead,
