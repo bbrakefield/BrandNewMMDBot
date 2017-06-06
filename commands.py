@@ -28,7 +28,7 @@ class Commands:
         try:
             self.bot_config = BotConfig.select().get()
         except:
-            logging.info("Error retrieving bot config")
+            logging.error("Error retrieving bot config")
         
         self.prefix = self.bot_config.command_prefix
 
@@ -68,6 +68,7 @@ class Commands:
                     LastfmArtist.update(cover_image_local=artist_image_local).where(LastfmArtist.name == data.artist.name).execute()
                 except:
                     logging.info("Could not update LastfmArtist {}".format(data.artist.name))
+                    logging.warning("Could not update LastfmArtist")
                     pass
 
             if not data.album == None and not album_image_local == None and need_update:
@@ -75,13 +76,14 @@ class Commands:
                     LastfmAlbum.update(cover_image_local=album_image_local).where(
                         LastfmAlbum.title == data.album.title).execute()
                 except:
-                    logging.info("Could not update LastfmAlbum {}".format(data.album.name))
+                    logging.info("Could not update LastfmAlbum {}".format(data.album.title))
+                    logging.warning("Could not update LastfmAlbum")
                     pass
             if not data.user_in_db == None and not user_image_local == None and need_update:
                 try:
                     User.update(avatar_url_local=user_image_local).where(User.id == data.user_in_db.id).execute()
                 except:
-                    logging.info("Could not update User {}".format(data.user_in_db.id))
+                    logging.warning("Could not update User {}".format(data.user_in_db.id))
 
         need_update = False
         for rt_track in data.recent_trakcs:
@@ -102,6 +104,7 @@ class Commands:
                                 LastfmAlbum.title == rt_album.title).execute()
                         except:
                             logging.info("Could not update LastfmAlbum {}".format(rt_album.title))
+                            logging.warning("Could not update LastfmAlbum")
                             pass
 
             need_update = False
@@ -118,7 +121,8 @@ class Commands:
                             LastfmArtist.update(cover_image_local=rt_artist_image_local).where(
                                 LastfmArtist.name == rt_artist.name).execute()
                         except:
-                            logging.warning("Could not update LastfmArtist {}".format(rt_artist.name))
+                            logging.info("Could not update LastfmArtist {}".format(rt_artist.name))
+                            logging.warning("Could not update LastfmArtist")
 
 
         song_name = data.title
@@ -233,6 +237,7 @@ class Commands:
         try:
             subprocess.run(params, timeout=6,stdout=subprocess.DEVNULL)
         except:
+            logging.error("Subprocess crashed or timeout")
             await self.safe_send_message(
                     data.channel, "There was a problem with the request ",self.client.emoji.FeelsMetalHead,
                     expire_in=10)
@@ -252,6 +257,7 @@ class Commands:
         if sendStats:
             content = "Last.fm API: **{:0.2f}** seconds \nDownloading: **{:0.2f}** seconds ({} items) \nRendering: **{:0.2f}** seconds\nTotal: **{:0.2f}** seconds".format(
                 data.lastfm_fetch_time, download_time,download_item_count, render_time, total)
+            logging.info(content)
         output_file = os.path.join(cef3d_output_path, target_file)
 
         logging.info("Sending to Discord..")
@@ -291,7 +297,7 @@ class Commands:
                         pass
                 pass
         else:
-            logging.info("Artist returned None from Last.fm")
+            logging.warning("Artist returned None from Last.fm")
 
         # Artist cover
         # Look at the db 'cover_image_local'

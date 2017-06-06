@@ -6,7 +6,7 @@ import sys
 from commands import *
 from emoji import EmojiHelper
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.WARNING)
 logger = logging.getLogger(__name__)
 
 handler = logging.FileHandler(filename='mmd.log', encoding='utf-8', mode='w')
