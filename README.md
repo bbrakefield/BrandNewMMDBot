@@ -6,6 +6,8 @@ Current features:
 
 - Display 'now playing' information of a Last.fm user
 
+![](http://i.imgur.com/9GrbSFI.png)
+
 
 Roadmap:
 - Chart
