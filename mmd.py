@@ -93,7 +93,7 @@ class MusicBot(discord.Client):
                 )
         except Exception as ex:
             logger.error("Error handling command")
-            content = "I've had run into a problem while processing your command {}".format(self.emoji.FeelsMetalHead)
+            content = "I've run into a problem while processing your command {}".format(self.emoji.FeelsMetalHead)
             sentmsg = await self.safe_send_message(
                 message.channel, content,
                 expire_in=10
