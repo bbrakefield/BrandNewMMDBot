@@ -102,3 +102,5 @@ ENV/
 
 token
 .idea
+download_cache/
+html_render/
