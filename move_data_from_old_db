@@ -1,1 +1,0 @@
-INSERT INTO mmd.user(id, avatar_url, is_bot, register_date, name, display_name, join_date, discriminator) select discord_id, avatarUrl, isBot, registerDate, name, display_name,joinDate, discriminator  from metal_music_discord.user
