@@ -228,8 +228,8 @@ class Commands:
             params.append(rta)
         cef3d_proc = subprocess.Popen(params, stdout=subprocess.PIPE)
 
-        for line in cef3d_proc.stdout:
-            print(line.rstrip().decode('ascii'))
+        # for line in cef3d_proc.stdout:
+        #     print(line.rstrip().decode('ascii'))
 
         render_end_time = time.time()
         render_time = (render_end_time - render_start_time)
