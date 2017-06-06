@@ -216,7 +216,7 @@ class Commands:
             user_avatar = "-"
 
         render_start_time = time.time()
-        target_file = user_name + str(time.time()) + ".png"
+        target_file = user_name + ".png"
         params = [cef3d_exe_path,  # target process
                   os.path.join(cef3d_path, "assets", "index.html"), os.path.join(cef3d_output_path, target_file),
                   # source html, target png
@@ -228,8 +228,7 @@ class Commands:
             params.append(rta)
         cef3d_proc = subprocess.Popen(params, stdout=subprocess.PIPE)
 
-        # for line in cef3d_proc.stdout:
-        #     print(line.rstrip().decode('ascii'))
+        cef3d_proc.communicate()
 
         render_end_time = time.time()
         render_time = (render_end_time - render_start_time)
@@ -247,6 +246,7 @@ class Commands:
                 data.lastfm_fetch_time, download_time,download_item_count, render_time, total)
         output_file = os.path.join(cef3d_output_path, target_file)
 
+        logging.info("Sending to Discord..")
         # Finally, send to discord
         with open(output_file, 'rb') as f:
             if sendStats:
