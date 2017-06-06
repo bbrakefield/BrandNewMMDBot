@@ -24,6 +24,7 @@ class MusicBot(discord.Client):
     async def on_ready(self):
         logger.info("Bot is ready.")
 
+        await self.change_presence(game=discord.Game(name='Type {}np LastfmUsername'.format(self.commands.prefix)))
 
 
     async def cmd_np(self, message,user_mentions):
