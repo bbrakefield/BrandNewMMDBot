@@ -230,6 +230,14 @@ class Commands:
 
         cef3d_proc.communicate()
 
+        try:
+            subprocess.run(params, timeout=6)
+        except:
+            await self.safe_send_message(
+                    data.channel, "There was a problem with the request ",self.client.emoji.FeelsMetalHead,
+                    expire_in=10)
+
+
         render_end_time = time.time()
         render_time = (render_end_time - render_start_time)
         logging.info("Cef3D stage took " + str(render_end_time - render_start_time))
