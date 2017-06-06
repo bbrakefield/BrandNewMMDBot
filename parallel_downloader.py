@@ -100,10 +100,6 @@ class ParallelDownloader:
 
     def on_downloads_complete(self,param):
         self.session.close()
-
-        for item in self.downloaded_items:
-            print("Item {} - {}".format(item.original_url, item.target_path))
-
         asyncio.ensure_future(self.done_callback(self.urls,self.custom_data_on_callback))
 
     def random_string(self,size=6, chars=string.ascii_uppercase + string.digits):

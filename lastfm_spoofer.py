@@ -73,10 +73,10 @@ class LastfmUtility:
         lastfm_user = self.lastfm.get_user(username)
         user_name = username
         user_real_name = username
-        user_image = lastfm_user.get_image()
+        user_image = "-"
         user_playcount = lastfm_user.get_playcount()
-        user_age = lastfm_user.get_age()
-        user_gender = lastfm_user.get_gender()
+        user_age = 12
+        user_gender = "-"
         loved_count = 0
         try:
             loved_tracks = lastfm_user.get_loved_tracks(limit=1000)
@@ -117,8 +117,12 @@ class LastfmUtility:
         artist = LastfmArtist()
         artist.name = pylast_artist.get_name()
         artist.cover_image = pylast_artist.get_cover_image()
-        artist.play_count = pylast_artist.get_playcount()
-        artist.listener_count = pylast_artist.get_listener_count()
-        artist.bio = pylast_artist.get_bio("summary")
-        artist.url = pylast_artist.get_url()
+        artist.play_count = 0
+        artist.listener_count = 0
+        artist.bio = ""
+        artist.url = ""
+        # artist.play_count = pylast_artist.get_playcount()
+        # artist.listener_count = pylast_artist.get_listener_count()
+        # artist.bio = pylast_artist.get_bio("summary")
+        # artist.url = pylast_artist.get_url()
         return artist

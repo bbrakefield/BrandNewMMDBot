@@ -39,25 +39,21 @@
                 </div>
                 <div class="item">
                     <div class="item-upper">
-                        Artists
-                    </div>
-                    <div class="item-lower" id="userArtistCount">
-                        2500
-                    </div>
-                </div>
-                <div class="item">
-                    <div class="item-upper">
                         Loved
                     </div>
                     <div class="item-lower" id="userFavourites">
                         120
                     </div>
                 </div>
-            </div>            
-        </div>
-        <div class="bottom-panel">
-            <div id="footerText">
             </div>
+                <div class="pvt-panel">
+                    <div class="pvt-title">
+                        Previous Tracks
+                    </div>
+                    <div class="pvt-item-container" id="pvt">
+
+                    </div>
+                </div>
         </div>
         </div>
     </div>
@@ -84,7 +80,7 @@
             window.cppUserName = "";
         
         if(!window.cppUserAvatar)
-            window.cppUserAvatar = "avatar.webp";
+            window.cppUserAvatar = "avatar.gif";
 
         if(!window.cppUserArtistCount)
             window.cppUserArtistCount = -1;
@@ -101,25 +97,25 @@
         if(!window.cppArtistCover)
             window.cppArtistCover = "artist_not_found.jpg"
 
-        // var albumCoverCount = 2;
+         var albumCoverCount = 3;
 
-        // for(var i = 0; i < albumCoverCount; i++) {
-        //     if(!window["prev_track_" + i + "_cover"])
-        //         window["prev_track_" + i + "_cover"] = "album.jpg";
+         for(var i = 0; i < albumCoverCount; i++) {
+             if(!window["prev_track_" + i + "_cover"])
+                 window["prev_track_" + i + "_cover"] = "artist_not_found.jpg";
 
-        //     if(!window["prev_track_" + i + "_text"])
-        //         window["prev_track_" + i + "_text"] = "broken";
+             if(!window["prev_track_" + i + "_text"])
+                 window["prev_track_" + i + "_text"] = "broken";
 
-        //     createPrevTrack({ image: window["prev_track_" + i + "_cover"], text: window["prev_track_" + i + "_text"]});
-        // }
+             createPrevTrack({ image: window["prev_track_" + i + "_cover"], text: window["prev_track_" + i + "_text"]});
+         }
         
-        // function createPrevTrack(pvtinfo) {
-        //     var txt = document.createElement("div");
-        //     txt.className = "item";
-        //     txt.innerHTML = "<div class=\"pvt-album-cover\" style=\"background-image: url(\'"+ pvtinfo.image+ "\')\";></div><div class\"album-text\">" + pvtinfo.text + "</div>"
-        //     var parent = document.getElementById('pvt');
-        //     parent.insertBefore(txt, parent.lastChild);
-        // }
+         function createPrevTrack(pvtinfo) {
+             var txt = document.createElement("div");
+             txt.className = "pvt-item";
+             txt.innerHTML = "<div class=\"pvt-cover\" style=\"background-image: url(\'"+ pvtinfo.image+ "\')\";></div><div class=\"pvt-text\">" + pvtinfo.text + "</div>"
+             var parent = document.getElementById('pvt');
+             parent.insertBefore(txt, parent.lastChild);
+         }
 
         function setInfo() {
             document.getElementById("songName").innerText = window.cppSongName;
@@ -131,10 +127,10 @@
 
             document.getElementById("userName").innerText = window.cppUserName;
             document.getElementById("userAvatar").style = "background-image: url('"+  window.cppUserAvatar + "');";
-            document.getElementById("userArtistCount").innerText = window.cppUserArtistCount;
+            //document.getElementById("userArtistCount").innerText = window.cppUserArtistCount;
             document.getElementById("userScrobbles").innerText = window.cppUserScrobbles;
             document.getElementById("userFavourites").innerText = window.cppUserFavourites;
-            document.getElementById("footerText").innerText = "http://last.fm/user/" + window.cppUserName;
+            //document.getElementById("footerText").innerText = "http://last.fm/user/" + window.cppUserName;
 
             document.getElementById("albumCover").style = "background-image: url('"+  window.cppAlbumCover + "');";
             document.getElementById("artistCover").style = "background-image: url('"+  window.cppArtistCover + "');";

@@ -4,6 +4,7 @@ import logging
 import inspect
 import sys
 from commands import *
+from emoji import EmojiHelper
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -12,21 +13,13 @@ handler = logging.FileHandler(filename='mmd.log', encoding='utf-8', mode='w')
 handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 logger.addHandler(handler)
 
-
-COMMAND_PREFIX = "!"
-
-class Response:
-    def __init__(self, content, reply=False, delete_after=0):
-        self.content = content
-        self.reply = reply
-        self.delete_after = delete_after
-
 class MusicBot(discord.Client):
     def __init__(self,token):
         self.auth = token
         super().__init__()
 
         self.commands = Commands(self)
+        self.emoji = EmojiHelper()
 
     async def on_ready(self):
         logger.info("Bot is ready.")
@@ -34,7 +27,18 @@ class MusicBot(discord.Client):
 
 
     async def cmd_np(self, message,user_mentions):
-        await self.commands.cmd_nowplaying(message,user_mentions)
+        await self.send_typing(message.channel)
+
+        response = await self.commands.cmd_nowplaying(message,user_mentions)
+        if not response == None:
+            return response
+
+    async def cmd_npstats(self, message, user_mentions):
+        await self.send_typing(message.channel)
+
+        response = await self.commands.cmd_nowplaying(message, user_mentions, True)
+        if not response == None:
+            return response
 
     # Test command
     async def cmd_test(self):
@@ -43,8 +47,11 @@ class MusicBot(discord.Client):
     async def on_message(self,message):
         message_content = message.content.strip()
 
+        if not message_content.startswith(self.commands.prefix):
+            return
+
         command, *args = message_content.split()
-        command = command[len(COMMAND_PREFIX):].lower().strip()
+        command = command[len(self.commands.prefix):].lower().strip()
 
         handler = getattr(self, 'cmd_%s' % command, None)
         if not handler:
@@ -86,6 +93,11 @@ class MusicBot(discord.Client):
                 )
         except Exception as ex:
             logger.error("Error handling command")
+            content = "I've had run into a problem while processing your command {}".format(self.emoji.FeelsMetalHead)
+            sentmsg = await self.safe_send_message(
+                message.channel, content,
+                expire_in=10
+            )
             print(ex)
 
     async def safe_send_message(self, dest, content, *, tts=False, expire_in=0, also_delete=None, quiet=False):

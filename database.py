@@ -19,6 +19,7 @@ class LastfmUser(Model):
 class User(Model):
     id = IntegerField(primary_key=True)
     avatar_url = CharField()
+    avatar_url_local = CharField()
     is_bot = BooleanField()
     register_date = DateTimeField()
     name = CharField()
