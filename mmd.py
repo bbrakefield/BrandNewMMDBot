@@ -29,6 +29,8 @@ class MusicBot(discord.Client):
         except:
             logging.warning("Could not set presence")
 
+    async def cmd_setlastfm(self, message):
+        await self.commands.cmd_setlastfm(message)
 
     async def cmd_np(self, message,user_mentions):
         await self.send_typing(message.channel)
@@ -51,12 +53,18 @@ class MusicBot(discord.Client):
         if not response == None:
             return response
 
-    # Test command
-    async def cmd_test(self):
-        return Response("Test response", reply=True, delete_after=5)
-
     async def on_message(self,message):
         message_content = message.content.strip()
+
+        # Special case of !setlastfm
+
+        dummy_prefix = "!"
+
+        if message_content.startswith(dummy_prefix):
+            split = message_content.split('{}{} '.format(dummy_prefix, "setlastfm"))
+
+            if len(split) == 2:
+                await self.commands.cmd_setlastfm(message)
 
         if not message_content.startswith(self.commands.prefix):
             return

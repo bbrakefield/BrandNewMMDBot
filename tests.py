@@ -22,8 +22,6 @@ class MockDiscordMember:
         self.joined_at = join_date
 
 
-
-
 class MockDiscordMessage:
     def __init__(self, content, author):
         self.content = content
@@ -104,8 +102,8 @@ class TestLogic(unittest.TestCase):
 
     def test_cmd_nowplaying(self):
         with closing(asyncio.get_event_loop()) as loop:
-            cmd = "nowplaying"
-            cmd_text = "{}{}".format(self.cmd_prefix, cmd)
+            cmd = "np"
+            cmd_text = "{}{} windziin".format(self.cmd_prefix, cmd)
 
             message = MockDiscordMessage(content=cmd_text, author=self.mock_author)
             now_playing_task = self.cmd.cmd_nowplaying(message=message, user_mentions=[])

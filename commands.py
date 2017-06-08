@@ -392,6 +392,13 @@ class Commands:
             elif params_len == 2:
                 lastfm_user_name = split[1]
                 cmd_mode = 2
+                try:
+                    lastfm_user = LastfmUser.select().where(LastfmUser.name == lastfm_user_name).get()
+                except:
+                    logging.error("Could not find user {} on database".format(lastfm_user_name))
+
+                if lastfm_user is not None:
+                    user = User.select().where(User.lastfm_user == lastfm_user).get()
 
         if lastfm_user is None and lastfm_user_name is None:
             return Response("There was an error with parameter input")
@@ -410,7 +417,7 @@ class Commands:
 
     async def cmd_nowplaying(self, message, user_mentions, stats=False):
         start_time = time.time()
-        result = self.parse_cmd_with_user("nowplaying", message, user_mentions)
+        result = self.parse_cmd_with_user("np", message, user_mentions)
 
         logging.info("nowplaying is ready to execute")
         logging.info("User Name: {}".format(result.lastfm_user_name))
@@ -418,7 +425,7 @@ class Commands:
         np = None
 
         np = self.lastfm.get_recent_tracks(result.lastfm_user_name, limit=3) # Last 4 tracks, first should be nowplaying
-        if len(np) > 0 and np[0].is_nowplaying is not True:
+        if np is not None and len(np) > 0 and np[0].is_nowplaying is not True:
             np = None
         elif len(np) == 0:
             np = None
@@ -494,10 +501,9 @@ class Commands:
             files_to_download.append(album_cover)
 
         # Check covers for 'recent tracks'
-
         for r_track in recent_tracks:
             if r_track.image is not None and self.cache.exists_in_cache(url2filename(r_track.image)) is False:
-                files_to_download.append(album_cover)
+                files_to_download.append(r_track.image)
 
         now_playing_entry = NowPlayingEntry(
             now_playing_track = now_playing_track,
@@ -528,7 +534,7 @@ class Commands:
             now_playing_track.image = now_playing_track.image.replace('\\', '/')
 
         song_name = now_playing_track.title
-        artist_name = "-"
+        artist_name = now_playing_track.artist.name
         artist_scrobbles = 0  # not used
         album_scrobbles = 0  # not used
         duration = "-"
@@ -536,7 +542,7 @@ class Commands:
         user_avatar = self.cache.get_cache_path_from_url(data.user_avatar)
         user_artist_count = cmd_parse_result.lastfm_user.artist_count
         user_scrobbles = cmd_parse_result.lastfm_user.play_count
-        user_favourites = 0
+        user_favourites = cmd_parse_result.lastfm_user.album_count
         total_scrobbles = 0  # not used
 
         if now_playing_track.image is not None:
@@ -603,7 +609,7 @@ class Commands:
         logging.info("Cef3D stage took " + str(render_end_time - render_start_time))
 
         with open(output_file, 'rb') as f:
-            await self.client.send_file(data.channel, output_file)
+            await self.client.send_file(data.channel, f)
 
 
 
@@ -662,10 +668,15 @@ class Commands:
                                                     age=0, gender="", registered=api_user.registered, playlist_count=api_user.playlist_count, loved_count=0,artist_count=artist_count,album_count=album_count)
 
                         # And finally, link the users
-                        user.update(lastfm_user=lastfm_user).execute()
+                        User.update(lastfm_user=lastfm_user).where(User.id == user.id).execute()
                     except:
                         logging.error("Could not create LastfmUser {}".format(lastfm_username))
                         return Response("There was a problem trying to process this user.")
+                else:
+                    try:
+                        LastfmUser.update(artist_count=artist_count, album_count=album_count, image=api_user.image, play_count=api_user.scrobbles).where(LastfmUser.name == lastfm_username).execute()
+                    except:
+                        logging.error("Could not update LastfmUser {}".format(lastfm_username))
             except:
                 logging.error("There was an error trying to process this user {}".format(lastfm_username))
                 return Response("There was a problem trying to process this user.")

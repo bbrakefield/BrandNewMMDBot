@@ -177,8 +177,9 @@ class LastfmAPI:
         tracks = []
 
         api_method = "user.getRecentTracks"
-
-        header_request = requests.get(get_page_endpoint(api_method,user_name,limit,1))
+        url = get_page_endpoint(api_method,user_name,limit,1)
+        logging.info(url)
+        header_request = requests.get(url)
 
         if header_request.status_code == 200:
             content = header_request.text
@@ -268,7 +269,7 @@ class LastfmAPI:
                     try:
                         artist = track['artist']
                         artist_name = artist['#text']
-                        artist_inst = LastfmAPIArtist(artist_name,"",0)
+                        artist_inst = LastfmAPIArtist(artist_name,"",0,"",0)
                     except:
                         pass
 
@@ -335,7 +336,7 @@ class LastfmAPI:
                             image = artist['image'][i]
 
 
-                    artist_inst = LastfmAPIArtist(name,playcount,url,image)
+                    artist_inst = LastfmAPIArtist(name,playcount,url,image,0)
                     artist_instances.append(artist_inst)
             return artist_instances
         except Exception as ex:
@@ -384,7 +385,7 @@ class LastfmAPI:
                     artist = album['artist']
                     artist_name = artist['name']
                     artist_url = artist['url']
-                    artist_inst = LastfmAPIArtist(artist_name, artist_url,0,"")
+                    artist_inst = LastfmAPIArtist(artist_name, artist_url,0,"",0)
                     album_inst = LastfmAPIAlbum(name,playcount,url, artist_inst, image)
 
                     album_instances.append(album_inst)
