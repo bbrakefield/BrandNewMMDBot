@@ -1,81 +1,52 @@
-import pylast
 import time
 import os
 import logging
 from database import *
-from lastfm_spoofer import *
+import json
+import requests
+from lastfm_api import *
 
-API_KEY = "1c15b9ea24af56c25eac1d40b24cf6b5"
-API_SECRET = "2fc65d3ac585f3738b8c56a8b6013d6f"
-
-# Renamed because name collision
-class MMDTrack:
-    def __init__(self,artist, album, track):
-        self.artist = artist
-        self.album = album
-        self.track = track
 
 class LastFmWrapper:
     def __init__(self):
         logging.info("Initializing Last.fm...")
-        self.network = pylast.LastFMNetwork(api_key=API_KEY, api_secret=API_SECRET)
-        self.utility = LastfmUtility(self)
+        self.api = LastfmAPI()
 
-    def get_user(self,user_name):
-        lastfm_user = self.network.get_user(user_name)
-
-        library = lastfm_user.get_library()
-        return library.get_user()
-
-    def get_user_from_db(self, user_name):
+    def get_now_playing(self, user_name):
         try:
-            return LastfmUser.select().where(LastfmUser.name == user_name).get()
+            recent_tracks = self.api.get_recent_tracks(user_name,limit=1)
+            if len(recent_tracks) > 0:
+                if recent_tracks[0].is_nowplaying:
+                    return recent_tracks[0]
         except:
             return None
 
-    def get_now_playing(self,user_name):
-        logging.info("get_now_playing: ({})".format(user_name))
+    def get_recent_tracks(self, user_name, limit=1000):
         try:
-            np = self.get_user(user_name).get_now_playing()
-            return np
-        except:
-            logging.info("return get_now_playing: None")
-            return None
-
-    def get_user_artists_from_db(self, user_name):
-        lastfm_user = self.get_user_from_db(user_name)
-        if lastfm_user == None:
-            return None
-
-        user_artists = LastfmUserArtist.select().where(LastfmUserArtist.user == lastfm_user).get()
-
-        if len(user_artists) > 0:
-            return user_artists
-        else:
-            return None
-
-    def get_user_artists(self, user_name, limit=1000):
-        try:
-            return self.get_user(user_name).get_top_artists(limit=limit)
+            recent_tracks = self.api.get_recent_tracks(user_name, limit=limit)
+            if len(recent_tracks) > 0:
+                return recent_tracks
+            else:
+                return None
         except:
             return None
 
 
-    def get_user_albums(self, user_name, limit=1000):
+    def get_user(self, user_name):
         try:
-            return self.get_user(user_name).get_top_albums(limit=limit)
+            return self.api.get_user_info(user_name)
         except:
             return None
 
-    def get_recent_trakcs(self, user_name, limit=10):
+    def get_user_artistcount(self, user_name):
         try:
-            return self.get_user(user_name).get_recent_tracks(limit=limit)
+            return self.api.get_user_artists(user_name, limit=1).total_artists
         except:
-            return None
+            return 0
 
-    def get_album_from_artist(self, artist, title):
+    def get_user_albumcount(self, user_name):
         try:
-            return pylast.Album(artist, title, self.network)
+            return self.api.get_user_albums(user_name, limit=1).total_albums
         except:
-            return None
+            return 0
 

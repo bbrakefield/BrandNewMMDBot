@@ -44,6 +44,13 @@ class MusicBot(discord.Client):
         if not response == None:
             return response
 
+    async def cmd_setlastfm(self, message):
+        await self.send_typing(message.channel)
+
+        response = await self.commands.cmd_setlastfm(message)
+        if not response == None:
+            return response
+
     # Test command
     async def cmd_test(self):
         return Response("Test response", reply=True, delete_after=5)
