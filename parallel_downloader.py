@@ -10,9 +10,6 @@ from urllib.parse import urlsplit, unquote
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
 
-current_dir = os.path.dirname(os.path.abspath(__file__))
-download_cache = os.path.join(current_dir,'download_cache')
-
 
 def url2filename(url):
     """Return basename corresponding to url.
@@ -31,18 +28,7 @@ def url2filename(url):
     return basename
 
 
-def exists_in_cache(filename):
-    abs_path = os.path.join(download_cache,url2filename(filename))
-    exists =  os.path.isfile(abs_path)
-    if not exists:
-        logging.info("Doesnt exist in cache {}".format(filename))
-    else:
-        logging.info("Found in cache {}".format(abs_path))
-    return exists
 
-# Only call if exists
-def get_cache_path_from_url(filename):
-    return os.path.join(download_cache, url2filename(filename))
 
 class DownloadItem:
     def __init__(self,original_url,target_path):

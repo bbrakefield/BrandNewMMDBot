@@ -12,14 +12,15 @@ class LastfmUser(Model):
     registered = TimestampField(null=True)
     playlist_count = IntegerField(null=True)
     loved_count = IntegerField()
+    artist_count = IntegerField()
+    album_count = IntegerField()
 
     class Meta:
         database = db
 
 class User(Model):
-    id = IntegerField(primary_key=True)
+    id = BigIntegerField(primary_key=True)
     avatar_url = CharField()
-    avatar_url_local = CharField()
     is_bot = BooleanField()
     register_date = DateTimeField()
     name = CharField()
@@ -117,10 +118,10 @@ db.connect()
 
 try:
     db.create_tables([
-    UserConfig
-    # BotConfig,
-    # User,
-    # LastfmUser,
+    UserConfig,
+    BotConfig,
+    User,
+    LastfmUser
     # DiscussionAlbum,
     # AlbumRating,
     # LastfmTrack,
