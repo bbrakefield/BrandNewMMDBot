@@ -227,7 +227,12 @@ class Commands:
         user_avatar = None
 
         if data.user_avatar is not None:
-            data.user_avatar = data.user_avatar.replace('\\', '/')
+            if len(data.user_avatar) > 0:
+                data.user_avatar = data.user_avatar.replace('\\', '/')
+            else:
+                data.user_avatar = "-"
+        else:
+            data.user_avatar = "-"
 
         if now_playing_track.image is not None:
             now_playing_track.image = now_playing_track.image.replace('\\', '/')
@@ -238,7 +243,7 @@ class Commands:
         album_scrobbles = 0  # not used
         duration = "-"
         user_name = cmd_parse_result.lastfm_user_name
-        user_avatar = self.cache.get_cache_path_from_url(data.user_avatar)
+        user_avatar = data.user_avatar
         user_artist_count = cmd_parse_result.lastfm_user.artist_count
         user_scrobbles = cmd_parse_result.lastfm_user.play_count
         user_favourites = cmd_parse_result.lastfm_user.album_count
@@ -297,7 +302,7 @@ class Commands:
             params.append(rta)
 
         try:
-            subprocess.run(params, timeout=6000,stdout=subprocess.DEVNULL)
+            subprocess.run(params, timeout=6,stdout=subprocess.DEVNULL)
         except:
             logging.error("Subprocess crashed or timeout")
             await self.client.safe_send_message(
