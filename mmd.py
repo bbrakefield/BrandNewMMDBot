@@ -64,7 +64,16 @@ class MusicBot(discord.Client):
             split = message_content.split('{}{} '.format(dummy_prefix, "setlastfm"))
 
             if len(split) == 2:
-                await self.commands.cmd_setlastfm(message)
+                message.content = "{}{} {}".format(self.commands.prefix,"setlastfm",split[1])
+                response = await self.commands.cmd_setlastfm(message)
+                if response is not None and isinstance(response, Response):
+                    await self.safe_send_message(
+                        message.channel, response.content,
+                        expire_in=response.delete_after
+                    )
+                    return
+
+
 
         if not message_content.startswith(self.commands.prefix):
             return

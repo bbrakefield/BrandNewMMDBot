@@ -42,320 +42,6 @@ class Commands:
 
         self.cache = Cache()
 
-    # async def nowplaying_download_complete(self,urls,data):
-    #     artist_image_local = None
-    #     album_image_local = None
-    #     user_image_local = None
-    #
-    #     album_in_db = None
-    #     user_in_db = None
-    #
-    #     download_time = 0
-    #     if not urls == None and len(urls) > 0:
-    #         download_time = time.time() - data.download_start_time
-    #
-    #     need_update = False
-    #     # Check for local images
-    #     if not data.artist == None:
-    #         artist_image_local = data.artist.cover_image_local
-    #     if not data.album == None:
-    #         album_image_local = data.album.cover_image_local
-    #     if not urls == None and len(urls) > 0:
-    #         for url in urls:
-    #             if not data.artist == None and url == data.artist.cover_image:
-    #                 artist_image_local = get_cache_path_from_url(url)
-    #                 need_update = True
-    #             elif not data.album == None and url == data.album.cover_image:
-    #                 album_image_local = get_cache_path_from_url(url)
-    #                 need_update = True
-    #
-    #             if not data.user_in_db == None and url == data.user_in_db.avatar_url:
-    #                 user_image_local = get_cache_path_from_url(url)
-    #                 need_update = True
-    #
-    #         if not artist_image_local == None and need_update:
-    #             try:
-    #                 LastfmArtist.update(cover_image_local=artist_image_local).where(LastfmArtist.name == data.artist.name).execute()
-    #             except:
-    #                 logging.info("Could not update LastfmArtist {}".format(data.artist.name))
-    #                 logging.warning("Could not update LastfmArtist")
-    #                 pass
-    #
-    #         if not data.album == None and not album_image_local == None and need_update:
-    #             try:
-    #                 LastfmAlbum.update(cover_image_local=album_image_local).where(
-    #                     LastfmAlbum.title == data.album.title).execute()
-    #             except:
-    #                 logging.info("Could not update LastfmAlbum {}".format(data.album.title))
-    #                 logging.warning("Could not update LastfmAlbum")
-    #                 pass
-    #         if not data.user_in_db == None and not user_image_local == None and need_update:
-    #             try:
-    #                 User.update(avatar_url_local=user_image_local).where(User.id == data.user_in_db.id).execute()
-    #             except:
-    #                 logging.warning("Could not update User {}".format(data.user_in_db.id))
-    #
-    #     need_update = False
-    #     for rt_track in data.recent_trakcs:
-    #         rt_album = rt_track.album
-    #         rt_artist = rt_track.artist
-    #
-    #         rt_album_image_local = None
-    #         if not rt_album == None:
-    #             if not urls == None and len(urls) > 0:
-    #                 for url in urls:
-    #                     if url == rt_album.cover_image:
-    #                         rt_album_image_local = get_cache_path_from_url(rt_album.cover_image)
-    #                         need_update = True
-    #
-    #                 if not rt_album_image_local == None and need_update:
-    #                     try:
-    #                         LastfmAlbum.update(cover_image_local=rt_album_image_local).where(
-    #                             LastfmAlbum.title == rt_album.title).execute()
-    #                     except:
-    #                         logging.info("Could not update LastfmAlbum {}".format(rt_album.title))
-    #                         logging.warning("Could not update LastfmAlbum")
-    #                         pass
-    #
-    #         need_update = False
-    #         rt_artist_image_local = None
-    #         if not rt_artist == None:
-    #             if not urls == None and len(urls) > 0:
-    #                 for url in urls:
-    #                     if url == rt_artist.cover_image:
-    #                         rt_artist_image_local = get_cache_path_from_url(rt_artist.cover_image)
-    #                         need_update = True
-    #
-    #                 if not rt_artist_image_local == None and need_update:
-    #                     try:
-    #                         LastfmArtist.update(cover_image_local=rt_artist_image_local).where(
-    #                             LastfmArtist.name == rt_artist.name).execute()
-    #                     except:
-    #                         logging.info("Could not update LastfmArtist {}".format(rt_artist.name))
-    #                         logging.warning("Could not update LastfmArtist")
-    #
-    #
-    #     song_name = data.title
-    #     artist_name = "-"
-    #     artist_scrobbles = 0  # not used
-    #     album_scrobbles = 0  # not used
-    #     duration = "-"
-    #     user_name = data.lastfm_user.name
-    #     user_avatar = "-"
-    #     user_artist_count = 0  # not used
-    #     user_scrobbles = data.lastfm_user.play_count  # not used
-    #     user_favourites = data.lastfm_user.loved_count  # not used
-    #     total_scrobbles = 0  # not used
-    #     album_cover = album_image_local
-    #     artist_cover = artist_image_local
-    #
-    #     # Artist
-    #     if not data.artist == None:
-    #         artist_name = data.artist.name
-    #         artist_in_db = LastfmArtist.select().where(LastfmArtist.name == data.artist.name).get()
-    #
-    #     # Album
-    #     if not data.album == None:
-    #         album_in_db = LastfmAlbum.select().where(LastfmAlbum.title == data.album.title).get()
-    #
-    #     if not data.user_in_db == None:
-    #         user_in_db = User.select().where(User.id == data.user_in_db.id).get()
-    #
-    #     # Track
-    #     # track_in_db = None
-    #
-    #     # try:
-    #     #     track_in_db = LastfmTrack.select().where(LastfmTrack.title == data.title, LastfmTrack.artist == artist_in_db, LastfmTrack.album == album_in_db).get()
-    #     # except:
-    #     #     logging.info("Track not found")
-    #
-    #     if not artist_in_db == None:
-    #         artist_cover = artist_in_db.cover_image_local
-    #
-    #     if not album_in_db == None:
-    #         album_cover = album_in_db.cover_image_local
-    #
-    #     if not user_in_db == None:
-    #         user_avatar = user_in_db.avatar_url_local
-    #
-    #     recent_trakcs_array = []
-    #
-    #     if not artist_cover == None:
-    #         artist_cover = artist_cover.replace('\\','/')
-    #
-    #     if not album_cover == None:
-    #         album_cover = album_cover.replace('\\', '/')
-    #
-    #     if not user_avatar == None:
-    #         user_avatar = user_avatar.replace('\\', '/')
-    #
-    #     for rt in data.recent_trakcs:
-    #         rt_album_in_db = None
-    #         cover = None
-    #         if not rt.album == None:
-    #             try:
-    #                 rt_album_in_db = LastfmAlbum.select().where(LastfmAlbum.title == rt.album.title).get()
-    #             except:
-    #                 pass
-    #
-    #         text = "{} - {}".format(rt.artist.name,rt.track.title)
-    #         if not rt_album_in_db == None:
-    #             cover = rt_album_in_db.cover_image_local
-    #
-    #         if cover == None:
-    #             cover = "artist_not_found.jpg"
-    #
-    #         recent_trakcs_array.append(cover.replace('\\','/'))
-    #         recent_trakcs_array.append(text)
-    #
-    #     c = len(recent_trakcs_array)
-    #     for i in range(12 - c):
-    #         recent_trakcs_array.append("artist_not_found.jpg")
-    #
-    #
-    #     if album_cover == None:
-    #         logging.warning("Setting default album cover")
-    #         album_cover = "artist_not_found.jpg"
-    #
-    #     if artist_cover == None:
-    #         logging.warning("Setting default artist cover")
-    #         artist_cover = "artist_not_found.jpg"
-    #
-    #     if user_avatar == None:
-    #         logging.warning("Setting default user image")
-    #         user_avatar = "-"
-    #
-    #     if data.user_in_db == None and data.lastfm_user == None:
-    #         logging.warning("Setting default user image")
-    #         user_avatar = "-"
-    #
-    #     render_start_time = time.time()
-    #     target_file = user_name + ".png"
-    #     params = [cef3d_exe_path,  # target process
-    #               os.path.join(cef3d_path, "assets", "index.html"), os.path.join(cef3d_output_path, target_file),
-    #               # source html, target png
-    #               song_name, artist_name, album_cover, str(artist_scrobbles), str(album_scrobbles),
-    #               str(total_scrobbles), duration, user_name, user_avatar, str(user_artist_count), str(user_scrobbles),
-    #               str(user_favourites), str(artist_cover)]
-    #
-    #     for rta in recent_trakcs_array:
-    #         params.append(rta)
-    #     #cef3d_proc = subprocess.Popen(params, stdout=subprocess.PIPE)
-    #
-    #     #cef3d_proc.communicate()
-    #
-    #     try:
-    #         subprocess.run(params, timeout=6,stdout=subprocess.DEVNULL)
-    #     except:
-    #         logging.error("Subprocess crashed or timeout")
-    #         await self.safe_send_message(
-    #                 data.channel, "There was a problem with the request ",self.client.emoji.FeelsMetalHead,
-    #                 expire_in=10)
-    #
-    #
-    #     render_end_time = time.time()
-    #     render_time = (render_end_time - render_start_time)
-    #     logging.info("Cef3D stage took " + str(render_end_time - render_start_time))
-    #     download_item_count = 0
-    #     if not urls == None:
-    #         download_item_count = len(urls)
-    #     total = data.lastfm_fetch_time + download_time + render_time
-    #
-    #
-    #     sendStats = data.sendStats
-    #     content = None
-    #     if sendStats:
-    #         content = "Last.fm API: **{:0.2f}** seconds \nDownloading: **{:0.2f}** seconds ({} items) \nRendering: **{:0.2f}** seconds\nTotal: **{:0.2f}** seconds".format(
-    #             data.lastfm_fetch_time, download_time,download_item_count, render_time, total)
-    #         logging.info(content)
-    #     output_file = os.path.join(cef3d_output_path, target_file)
-    #
-    #     logging.info("Sending to Discord..")
-    #     # Finally, send to discord
-    #     with open(output_file, 'rb') as f:
-    #         if sendStats:
-    #             await self.client.send_file(data.channel, output_file, content=content)
-    #         else:
-    #             await self.client.send_file(data.channel, output_file)
-    #
-    #
-    # def process_track(self,track, lastfm_user,download_queue, is_recent_track=False):
-    #     # Now playing song title
-    #     np_title = track.title
-    #
-    #     # Now playting artist
-    #     np_artist = track.artist
-    #
-    #     # Album
-    #     np_album = track.album
-    #
-    #     artist_in_db = None
-    #     album_in_db = None
-    #
-    #     if not np_artist == None:
-    #         np_artist_name = np_artist.name
-    #         # Find artist in database
-    #         try:
-    #             artist_in_db = LastfmArtist.select().where(LastfmArtist.name == np_artist_name).get()
-    #         except:
-    #             logging.info("Artist {} not found in database".format(np_artist_name))
-    #             if not is_recent_track:
-    #                 try:
-    #                     artist_in_db = self.lastfm.utility.save_artist_info(lastfm_user, np_artist)
-    #                 except:
-    #                     logging.info("Could not add Artist {} to the database".format(np_artist_name))
-    #                     pass
-    #             pass
-    #     else:
-    #         logging.warning("Artist returned None from Last.fm")
-    #
-    #     # Artist cover
-    #     # Look at the db 'cover_image_local'
-    #     # If it exists, skip
-    #     # If it doesnt exists, add the remote URL to download queue
-    #     if not artist_in_db == None:
-    #         artist_cover_local = artist_in_db.cover_image_local
-    #
-    #         if artist_cover_local == None:
-    #             if not artist_in_db.cover_image in download_queue:
-    #                 download_queue.append(artist_in_db.cover_image)
-    #
-    #     # Find album in database
-    #     if not np_album == None and not artist_in_db == None:
-    #         try:
-    #             album_in_db = LastfmAlbum.select().where(LastfmAlbum.title == np_album.title).get()
-    #         except:
-    #             logging.info("Album {} not found in database".format(np_album.title))
-    #             try:
-    #                 album_in_db = LastfmAlbum.create(title=np_album.title, artist=artist_in_db,
-    #                                                  cover_image=np_album.get_cover_image(), url=np_album.get_url())
-    #             except:
-    #                 logging.info("Could not add Album {} to the database", np_album.title)
-    #                 pass
-    #             pass
-    #     else:
-    #         logging.info("Album returned null from Last.fm")
-    #
-    #     # Find track in db
-    #     # try:
-    #     #     LastfmTrack.select().where(LastfmTrack.title == np_title, LastfmTrack.artist == artist_in_db, LastfmTrack.album == album_in_db).get()
-    #     # except:
-    #     #     logging.info("Track not found")
-    #     #
-    #     #     try:
-    #     #         LastfmTrack.create(title = np_title, duration = track.get_duration(), artist = artist_in_db, album = album_in_db, url = track.get_url())
-    #     #     except:
-    #     #         logging.info("Could not create track {}".format(np_title))
-    #
-    #
-    #     # Album cover
-    #     if not album_in_db == None:
-    #         album_cover_local = album_in_db.cover_image_local
-    #
-    #         if (album_cover_local == None or len(album_cover_local) == 0) and not album_in_db.cover_image in download_queue:
-    #             download_queue.append(album_in_db.cover_image)
-    #     return artist_in_db, album_in_db
-
     def parse_cmd_with_user(self,cmd, message, user_mentions):
         message_content = message.content
         split = message_content.split('{}{} '.format(self.prefix, cmd))
@@ -396,9 +82,10 @@ class Commands:
                     lastfm_user = LastfmUser.select().where(LastfmUser.name == lastfm_user_name).get()
                 except:
                     logging.error("Could not find user {} on database".format(lastfm_user_name))
+                    lastfm_user = None
 
-                if lastfm_user is not None:
-                    user = User.select().where(User.lastfm_user == lastfm_user).get()
+                # if lastfm_user is not None:
+                #     user = User.select().where(User.lastfm_user == lastfm_user).get()
 
         if lastfm_user is None and lastfm_user_name is None:
             return Response("There was an error with parameter input")
@@ -417,12 +104,14 @@ class Commands:
 
     async def cmd_nowplaying(self, message, user_mentions, stats=False):
         start_time = time.time()
-        result = self.parse_cmd_with_user("np", message, user_mentions)
+        result = self.parse_cmd_with_user("np" if stats is False else "npstats", message, user_mentions)
 
         logging.info("nowplaying is ready to execute")
         logging.info("User Name: {}".format(result.lastfm_user_name))
 
         np = None
+
+        api_time_start = time.time()
 
         np = self.lastfm.get_recent_tracks(result.lastfm_user_name, limit=3) # Last 4 tracks, first should be nowplaying
         if np is not None and len(np) > 0 and np[0].is_nowplaying is not True:
@@ -502,15 +191,24 @@ class Commands:
 
         # Check covers for 'recent tracks'
         for r_track in recent_tracks:
-            if r_track.image is not None and self.cache.exists_in_cache(url2filename(r_track.image)) is False:
-                files_to_download.append(r_track.image)
+            if len(r_track.image) > 0:
+                if r_track.image is not None and self.cache.exists_in_cache(url2filename(r_track.image)) is False:
+                    files_to_download.append(r_track.image)
+
+        api_time_end = time.time()
+        api_time = api_time_end - api_time_start
+
+        download_time_start = time.time()
 
         now_playing_entry = NowPlayingEntry(
             now_playing_track = now_playing_track,
             recent_tracks = recent_tracks,
             user_avatar = user_avatar,
             cmd_parse_result = result,
-            channel = message.channel
+            channel = message.channel,
+            send_stats = stats,
+            api_time = api_time,
+            download_time_start = download_time_start
         )
         if len(files_to_download) > 0:
             parallel_downloader = ParallelDownloader(files_to_download, download_cache, now_playing_entry,
@@ -519,6 +217,7 @@ class Commands:
             await self.nowplaying_download_complete([],now_playing_entry)
 
     async def nowplaying_download_complete(self, urls, data):
+        download_time_end = time.time()
         now_playing_track = data.now_playing_track
         recent_tracks = data.recent_tracks
         cmd_parse_result = data.cmd_parse_result
@@ -582,6 +281,9 @@ class Commands:
         for i in range(12 - c):
             recent_tracks_array.append("artist_not_found.jpg")
 
+        download_time = download_time_end - data.download_time_start
+        logging.info("Start rendering..")
+
         render_start_time = time.time()
         target_file = user_name + ".png"
         params = [cef3d_exe_path,  # target process
@@ -602,14 +304,46 @@ class Commands:
                     data.channel, "There was a problem with the request {}".format(self.client.emoji.FeelsMetalHead),
                     expire_in=10)
 
+            return
+
         output_file = os.path.join(cef3d_output_path, target_file)
 
         render_end_time = time.time()
         render_time = (render_end_time - render_start_time)
         logging.info("Cef3D stage took " + str(render_end_time - render_start_time))
 
+        if urls is not None and len(urls) > 0:
+            stats = "Last.fm API: **{:0.2f}** seconds\nDownloading: **{:0.2f}** seconds (**{}** items)\nRendering: **{:0.2f}** seconds".format((data.api_time), (download_time), len(urls), (render_time))
+        else:
+            stats = "Last.fm API: **{:0.2f}** seconds\nDownloading: **{:0.2f}** seconds\nRendering: **{:0.2f}** seconds".format(
+                (data.api_time), (download_time), (render_time))
+
         with open(output_file, 'rb') as f:
-            await self.client.send_file(data.channel, f)
+            if data.send_stats:
+                await self.client.send_file(data.channel, f, content=stats)
+            else:
+                await self.client.send_file(data.channel, f)
+
+            # Update stats after sending the image
+            if cmd_parse_result.lastfm_user is not None:
+                try:
+                    lastfm_username = cmd_parse_result.lastfm_user.name
+                    logging.info("Updating user... {}".format(lastfm_username))
+
+                    api_user = self.lastfm.get_user(lastfm_username)
+                    if api_user is None:
+                        logging.error("Could not retrieve Last.fm user")
+                        return None
+
+                    # Artist count
+                    artist_count = self.lastfm.get_user_artistcount(lastfm_username)
+                    album_count = self.lastfm.get_user_albumcount(lastfm_username)
+                    try:
+                        LastfmUser.update(artist_count=artist_count, album_count=album_count, image=api_user.image, play_count=api_user.scrobbles).where(LastfmUser.name == lastfm_username).execute()
+                    except:
+                        logging.error("Could not update LastfmUser {}".format(lastfm_username))
+                except:
+                    logging.error("There was an error trying to update this user")
 
 
 
