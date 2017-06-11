@@ -227,8 +227,13 @@ class Commands:
         user_avatar = None
 
         if data.user_avatar is not None:
-            if len(data.user_avatar) > 0:
-                data.user_avatar = data.user_avatar.replace('\\', '/')
+            if len(data.user_avatar) > 0 and self.cache.exists_in_cache(url2filename(data.user_avatar)):
+                try:
+                    data.user_avatar = self.cache.get_cache_path_from_url(data.user_avatar)
+                    data.user_avatar = data.user_avatar.replace('\\', '/')
+                except:
+                    data.user_avatar = "-"
+                    pass
             else:
                 data.user_avatar = "-"
         else:
@@ -306,8 +311,7 @@ class Commands:
         except:
             logging.error("Subprocess crashed or timeout")
             await self.client.safe_send_message(
-                    data.channel, "There was a problem with the request {}".format(self.client.emoji.FeelsMetalHead),
-                    expire_in=10)
+                    data.channel, "There was a problem with the request {}".format(self.client.emoji.FeelsMetalHead))
 
             return
 
