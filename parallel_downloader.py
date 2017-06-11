@@ -51,7 +51,7 @@ class ParallelDownloader:
             try:
                 filename = url2filename(url)
             except:
-                filename = self.random_string()
+                filename = "error.png"
             filename = os.path.join(self.target_path, filename)
             logging.info('Downloading {} to {}'.format(url,filename))
             response = yield from session.get(url)
