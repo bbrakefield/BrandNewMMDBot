@@ -6,6 +6,9 @@ import sys
 from commands import *
 from emoji import EmojiHelper
 
+import signal
+signal.signal(signal.SIGINT, signal.SIG_DFL)
+
 logging.basicConfig(level=logging.WARNING)
 logger = logging.getLogger(__name__)
 
@@ -197,11 +200,14 @@ class MusicBot(discord.Client):
             logger.info("Exiting...")
             self.loop.close()
 
-
-
-with open("token", "r") as tokenfile:
-    token = ""
-    for line in tokenfile:
-        token += line
-    bot = MusicBot(token)
-    bot.run()
+if __name__ == '__main__':
+    try:
+        with open("token", "r") as tokenfile:
+            token = ""
+            for line in tokenfile:
+                token += line
+            bot = MusicBot(token)
+            bot.run()
+    except KeyboardInterrupt as ex:
+        print("Keyboard interrupted")
+        sys.exit(0)
