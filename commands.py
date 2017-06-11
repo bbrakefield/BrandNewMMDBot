@@ -196,7 +196,7 @@ class Commands:
                     files_to_download.append(r_track.image)
 
 
-        if result.cmd_mode == 2:
+        if user_avatar is not None and result.cmd_mode == 2:
             user_avatar = self.cache.get_cache_path_from_url(user_avatar)
 
         api_time_end = time.time()
@@ -239,7 +239,8 @@ class Commands:
             data.user_avatar = "-"
 
         if now_playing_track.image is not None:
-            now_playing_track.image = now_playing_track.image.replace('\\', '/')
+            if len(now_playing_track.image) > 0:
+                now_playing_track.image = now_playing_track.image.replace('\\', '/')
 
         song_name = now_playing_track.title
         artist_name = now_playing_track.artist.name
@@ -253,7 +254,7 @@ class Commands:
         user_favourites = cmd_parse_result.lastfm_user.album_count
         total_scrobbles = 0  # not used
 
-        if now_playing_track.image is not None:
+        if now_playing_track.image is not None and len(now_playing_track.image) > 0:
             album_cover = self.cache.get_cache_path_from_url(now_playing_track.image)
             artist_cover = album_cover # temporary
 
@@ -268,11 +269,11 @@ class Commands:
 
         recent_tracks_array = []
         for rt in recent_tracks:
-            cover = self.cache.get_cache_path_from_url(rt.image)
-            text = rt.title
+            cover = "artist_not_found.jpg"
+            if rt.image is not None and len(rt.image) > 0:
+                cover = self.cache.get_cache_path_from_url(rt.image)
 
-            if cover == None:
-                cover = "artist_not_found.jpg"
+            text = rt.title
 
             recent_tracks_array.append(cover.replace('\\','/'))
             recent_tracks_array.append(text)
@@ -280,11 +281,11 @@ class Commands:
         if user_avatar == None:
             user_avatar = "-"
 
-        if album_cover == None:
-            album_cover = None
+        if album_cover == None or len(album_cover) == 0:
+            album_cover = "artist_not_found.jpg"
 
-        if artist_cover == None:
-            artist_cover = None
+        if artist_cover == None or len(artist_cover) == 0:
+            artist_cover = "artist_not_found.jpg"
 
         c = len(recent_tracks_array)
         for i in range(12 - c):
@@ -327,10 +328,15 @@ class Commands:
                 (data.api_time), (download_time), (render_time))
 
         with open(output_file, 'rb') as f:
-            if data.send_stats:
-                await self.client.send_file(data.channel, f, content=stats)
-            else:
-                await self.client.send_file(data.channel, f)
+            try:
+                if data.send_stats:
+                    await self.client.send_file(data.channel, f, content=stats)
+                else:
+                    await self.client.send_file(data.channel, f)
+            except Exception as error:
+                logging.error("Error while trying to upload the file to Discord")
+                logging.error(error)
+
 
             # Update stats after sending the image
             if cmd_parse_result.lastfm_user is not None:

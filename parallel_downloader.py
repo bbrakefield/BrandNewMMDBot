@@ -54,15 +54,22 @@ class ParallelDownloader:
                 filename = "error.png"
             filename = os.path.join(self.target_path, filename)
             logging.info('Downloading {} to {}'.format(url,filename))
-            response = yield from session.get(url)
-            with closing(response), open(filename, 'wb') as file:
-                while True:  # save file
-                    chunk = yield from response.content.read(chunk_size)
-                    if not chunk:
-                        break
-                    file.write(chunk)
-            logging.info('Finished downloading {}'.format(filename))
-            self.downloaded_items.append(DownloadItem(url, filename))
+            response = None
+            try:
+                response = yield from session.get(url)
+            except:
+                logging.error("Error trying to download URL {}".format(url))
+            if response is not None:
+                with closing(response), open(filename, 'wb') as file:
+                    while True:  # save file
+                        chunk = yield from response.content.read(chunk_size)
+                        if not chunk:
+                            break
+                        file.write(chunk)
+                logging.info('Finished downloading {}'.format(filename))
+                self.downloaded_items.append(DownloadItem(url, filename))
+            else:
+                return True
 
         return filename, (response.status, tuple(response.headers.items()))
 
