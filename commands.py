@@ -195,6 +195,10 @@ class Commands:
                 if r_track.image is not None and self.cache.exists_in_cache(url2filename(r_track.image)) is False:
                     files_to_download.append(r_track.image)
 
+
+        if result.cmd_mode == 2:
+            user_avatar = self.cache.get_cache_path_from_url(user_avatar)
+
         api_time_end = time.time()
         api_time = api_time_end - api_time_start
 
@@ -228,7 +232,6 @@ class Commands:
 
         if data.user_avatar is not None:
             if len(data.user_avatar) > 0:
-                data.user_avatar = self.cache.get_cache_path_from_url(data.user_avatar)
                 data.user_avatar = data.user_avatar.replace('\\', '/')
             else:
                 data.user_avatar = "-"
