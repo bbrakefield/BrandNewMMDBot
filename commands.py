@@ -156,6 +156,7 @@ class Commands:
                 if lastfm_user.image is not None and len(lastfm_user.image) > 0:
                     user_avatar = lastfm_user.image
                     if self.cache.exists_in_cache(url2filename(user_avatar)) is False:
+                        user_avatar = self.cache.exists_in_cache(url2filename(user_avatar))
                         files_to_download.append(user_avatar)
             except:
                 # User is not known, look them up
@@ -227,13 +228,8 @@ class Commands:
         user_avatar = None
 
         if data.user_avatar is not None:
-            if len(data.user_avatar) > 0 and self.cache.exists_in_cache(url2filename(data.user_avatar)):
-                try:
-                    data.user_avatar = self.cache.get_cache_path_from_url(data.user_avatar)
-                    data.user_avatar = data.user_avatar.replace('\\', '/')
-                except:
-                    data.user_avatar = "-"
-                    pass
+            if len(data.user_avatar) > 0:
+                data.user_avatar = data.user_avatar.replace('\\', '/')
             else:
                 data.user_avatar = "-"
         else:
