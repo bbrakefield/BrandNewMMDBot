@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="profile.css">
+</head>
+<body>
+<div class="profile-container">
+    <div class="left-panel-container" id="leftPanelContainer">
+        <div class="left-panel">
+            <div class="artists-container">
+                <div class="top-artist">
+                    <div class="top-artist-container">
+                        <div class="top-artist-cover" id="topArtistCover">
+
+                        </div>
+                        <div class="top-artist-text" id="topArtistText">
+                            Insomnium
+                        </div>
+                    </div>
+                </div>
+                <div class="artists" id="idArtists">
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="right-panel-container" id="rightPanelContainer">
+        <div class="right-panel">
+            <div class="user-panel">
+                <div class="user-panel-container">
+                    <div class="user-avatar" style="background-image: url('artist_not_found.jpg');" id="userAvatar">
+
+                    </div>
+                </div>
+                <div class="user-info-panel">
+                    <div class="user-text" id="userName">
+                        arkenthera
+                    </div>
+                    <div class="user-info-panel-item-container">
+                        <div class="item">
+                            <div class="item-upper">
+                                Scrobbles
+                            </div>
+                            <div class="item-lower" id="userScrobbles">
+                                469863
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="item-upper">
+                                Artists
+                            </div>
+                            <div class="item-lower" id="userArtists">
+                                0
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="item-upper">
+                                Albums
+                            </div>
+                            <div class="item-lower" id="userAlbums">
+                                0
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="albums-container">
+                <div class="top-album">
+                    <div class="top-album-container">
+                        <div class="top-album-cover" id="topAlbumCover">
+
+                        </div>
+                        <div class="top-album-text" id="topAlbumText">
+                            Shadows of the Dying Sun
+                        </div>
+                    </div>
+                </div>
+                <div class="albums" id="idAlbums">
+
+                </div>
+                <div class="tags">
+                    <div class="tags-text" id="tagsText">
+                        Tags...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<img src="empty2.gif">
+
+    </img>
+<script>
+    if(!window.cppTopArtistCover)
+        window.cppTopArtistCover = "artist_not_found.jpg";
+
+    if(!window.cppTopArtistText)
+        window.cppTopArtistText = "-";
+
+     if(!window.cppUserArtists)
+         window.cppUserArtists = -1;
+
+    if(!window.cppUserScrobbles)
+        window.cppUserScrobbles = -1;
+
+    if(!window.cppUserAlbums)
+        window.cppUserAlbums = -1;
+
+    if(!window.cppTopAlbumCover)
+        window.cppTopAlbumCover = "artist_not_found.jpg";
+
+    if(!window.cppTopAlbumText)
+        window.cppTopAlbumText = "-";
+
+    if(!window.cppUserAvatar)
+        window.cppUserAvatar = "artist_not_found.jpg";
+
+    if(!window.cppUserName)
+        window.cppUserName = "-";
+
+    if(!window.cppTags)
+        window.cppTags = "";
+
+    if(!window.cppArtistCount)
+        window.cppArtistCount = 0;
+
+    if(!window.cppAlbumCount)
+        window.cppAlbumCount = 0;
+
+    var repeating_albums = [];
+    var repeating_artists = [];
+
+    function createTopAlbum(album) {
+         var txt = document.createElement("div");
+         txt.className = "album-item";
+         txt.innerHTML = "<div class=\"item-album-cover\" style=\"background-image: url(\'"+ album.image+ "\')\";></div><div class=\"item-album-text\">" + album.text + "</div>"
+         var parent = document.getElementById('idAlbums');
+         parent.insertBefore(txt, parent.lastChild);
+
+         repeating_albums.push(album.image)
+    }
+
+    function createTopArtist(artist) {
+         var txt = document.createElement("div");
+         txt.className = "artist-item";
+         txt.innerHTML = "<div class=\"item-artist-cover\" style=\"background-image: url(\'"+ artist.image+ "\')\";></div><div class=\"item-artist-text\">" + artist.text + "</div>"
+         var parent = document.getElementById('idArtists');
+         parent.insertBefore(txt, parent.lastChild);
+
+         repeating_artists.push(artist.image);
+    }
+
+
+
+    function set() {
+        document.getElementById("topArtistCover").style = "background-image: url('" + cppTopArtistCover + "');";
+        document.getElementById("topAlbumCover").style = "background-image: url('" + cppTopAlbumCover + "');";
+        document.getElementById("userAvatar").style = "background-image: url('" + cppUserAvatar + "');";
+
+        document.getElementById("topArtistText").innerText = window.cppTopArtistText;
+        document.getElementById("topAlbumText").innerText = window.cppTopAlbumText;
+
+        document.getElementById("userScrobbles").innerText = window.cppUserScrobbles;
+        document.getElementById("userArtists").innerText = window.cppUserArtists;
+        document.getElementById("userName").innerText = window.cppUserName;
+        document.getElementById("userAlbums").innerText = window.cppUserAlbums;
+        document.getElementById("tagsText").innerText = window.cppTags;
+
+        for(var i = 0; i < window.cppAlbumCount; i++) {
+            text = window["cppTopAlbum_" + i + "_Text"];
+            image = window["cppTopAlbum_" + i + "_Cover"];
+            createTopAlbum({ image: image, text: text });
+        }
+
+        for(var i = 0; i < window.cppArtistCount; i++) {
+            text = window["cppTopArtist_" + i + "_Text"];
+            image = window["cppTopArtist_" + i + "_Cover"];
+            createTopArtist({ image: image, text: text})
+        }
+
+        var repeating_album_bgs = "background-image: ";
+        for(var i = 0; i < repeating_albums.length; i++) {
+            repeating_album_bgs += "url('" + repeating_albums[i] + "'), ";
+        }
+
+        repeating_album_bgs = repeating_album_bgs.substring(0, repeating_album_bgs.length - 2);
+        repeating_album_bgs += ";";
+
+        var repeating_artist_bgs = "background-image: ";
+        for(var i = 0; i < repeating_artists.length; i++) {
+            repeating_artist_bgs += "url('" + repeating_artists[i] + "'), ";
+        }
+
+        repeating_artist_bgs = repeating_artist_bgs.substring(0, repeating_artist_bgs.length - 2);
+        repeating_artist_bgs += ";";
+
+        console.log(repeating_album_bgs);
+        console.log(repeating_artist_bgs);
+
+        document.getElementById("rightPanelContainer").style = repeating_album_bgs;
+        document.getElementById("leftPanelContainer").style = repeating_artist_bgs;
+    }
+    set();
+
+
+</script>
+</body>
+</html>

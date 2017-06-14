@@ -8,10 +8,11 @@ from cache import *
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 cef3d_path = os.path.join(current_dir,'cef3d')
-cef3d_exe_path = os.path.join(current_dir,'cef3d',"Cef3DHtmlRenderer.exe")
+cef3d_nowplaying_exe_path = os.path.join(current_dir,'cef3d',"MMD_Nowplaying.exe")
+cef3d_user_profile_exe_path = os.path.join(current_dir,'cef3d',"MMD_Profile.exe")
 cef3d_output_path = os.path.join(current_dir,"html_render")
 
-class NowPlayingEntry:
+class DynamicDictEntry:
     def __init__(self,**kw_args):
         self.__dict__.update(kw_args)
 
@@ -41,6 +42,229 @@ class Commands:
         self.prefix = self.bot_config.command_prefix
 
         self.cache = Cache()
+
+    async def cmd_lastfm(self, message, user_mentions, stats=False):
+        start_time = time.time()
+        result = self.parse_cmd_with_user("lastfm" if stats is False else "lastfmstats", message, user_mentions)
+
+        api_time_start = time.time()
+
+        user_artists_api = self.lastfm.get_user_artists(result.lastfm_user_name, limit=7)
+        if user_artists_api is None:
+            return Response(self.client.emoji.FeelsMetalHead)
+
+        user_artists = user_artists_api.artists
+        total_albums = user_artists_api.total_artists
+
+        user_albums_api = self.lastfm.get_user_albums(result.lastfm_user_name, limit=7)
+        if user_albums_api is None:
+            return Response(self.client.emoji.FeelsMetalHead)
+
+        user_albums = user_albums_api.albums
+        total_albums = user_albums_api.total_albums
+
+        files_to_download = []
+
+        user_artists_count = len(user_artists)
+
+        for user_artist in user_artists:
+            image = user_artist.image
+
+            if image is not None and len(image) > 0:
+                if self.cache.exists_in_cache(url2filename(image)) is False:
+                    files_to_download.append(image)
+
+        for user_album in user_albums:
+            image = user_album.image
+
+            if image is not None and len(image) > 0:
+                if self.cache.exists_in_cache(url2filename(image)) is False:
+                    files_to_download.append(image)
+
+        user_avatar = None
+        # Case 0
+        if result.cmd_mode == 1 or result.cmd_mode == 3:
+            avatar_cache_entry = self.cache.get_discord_user_avatar(result.user)
+            user_avatar = avatar_cache_entry.location
+            # If the user avatar doesnt exist on disk, add it to download items
+            if avatar_cache_entry.exists:
+                pass
+            elif avatar_cache_entry.needs_download:
+                files_to_download.append(avatar_cache_entry.url)
+
+        if result.cmd_mode == 2:
+            # Check if this user is known
+            try:
+                lastfm_user = LastfmUser.select().where(LastfmUser.name == result.lastfm_user_name).get()
+                if lastfm_user.image is not None and len(lastfm_user.image) > 0:
+                    user_avatar = lastfm_user.image
+                    if self.cache.exists_in_cache(url2filename(user_avatar)) is False:
+                        files_to_download.append(user_avatar)
+            except:
+                # User is not known, look them up
+                try:
+                    api_user = self.lastfm.get_user(result.lastfm_user_name)
+                    artist_count = self.lastfm.get_user_artistcount(result.lastfm_user_name)
+                    album_count = self.lastfm.get_user_albumcount(result.lastfm_user_name)
+                except:
+                    return Response("Could not find this user.")
+
+                # Save it to DB
+                try:
+                    lastfm_user = LastfmUser.create(name=result.lastfm_user_name, real_name=result.lastfm_user_name,
+                                                    image=api_user.image, play_count=api_user.scrobbles,
+                                                    age=0, gender="", registered=api_user.registered,
+                                                    playlist_count=api_user.playlist_count, loved_count=0,
+                                                    artist_count=artist_count, album_count=album_count)
+                    result.lastfm_user = lastfm_user
+                except:
+                    logging.error("Could not create LastfmUser {}".format(result.lastfm_user_name))
+                    pass
+                pass
+
+        api_time_end = time.time()
+        api_time = api_time_end - api_time_start
+
+        download_time_start = time.time()
+
+        entry = DynamicDictEntry(
+            user_albums = user_albums,
+            user_artists = user_artists,
+            user_avatar=user_avatar,
+            cmd_parse_result=result,
+            channel=message.channel,
+            send_stats=stats,
+            api_time=api_time,
+            download_time_start=download_time_start
+        )
+        if len(files_to_download) > 0:
+            parallel_downloader = ParallelDownloader(files_to_download, download_cache, entry,
+                                                     self.lastfm_download_complete)
+        else:
+            await self.lastfm_download_complete([], entry)
+
+
+
+    async def lastfm_download_complete(self, urls, data):
+        download_time_end = time.time()
+        user_albums = data.user_albums
+        user_artists = data.user_artists
+        cmd_parse_result = data.cmd_parse_result
+
+        user_top_artists_count = len(user_artists)
+        user_top_albums_count = len(user_albums)
+
+        top_artist = None
+        top_album = None
+
+        if user_top_artists_count > 0:
+            top_artist = user_artists[0]
+
+        if user_top_albums_count > 0:
+            top_album = user_albums[0]
+
+        render_top_artists_args = []
+        for t_artist in user_artists:
+            image = "artist_not_found.jpg"
+
+            if self.cache.exists_in_cache(url2filename(t_artist.image)):
+                image = self.cache.get_cache_path_from_url(t_artist.image)
+                image = image.replace('\\', '/')
+
+            render_top_artists_args.append(t_artist.name)
+            render_top_artists_args.append(image)
+
+        render_top_albums_args = []
+        for t_album in user_albums:
+            image = "artist_not_found.jpg"
+
+            if self.cache.exists_in_cache(url2filename(t_album.image)):
+                image = self.cache.get_cache_path_from_url(t_album.image)
+                image = image.replace('\\', '/')
+
+            render_top_albums_args.append(t_album.name)
+            render_top_albums_args.append(image)
+
+        top_artist_args = ["-", "artist_not_found.jpg"]
+        if top_artist is not None:
+            image = top_artist.image
+            if image is not None and len(image) > 0:
+                image = self.cache.get_cache_path_from_url(image)
+                image = image.replace('\\', '/')
+            else:
+                image = "artist_not_found.jpg"
+            top_artist_args = [top_artist.name, image]
+
+        top_album_args = ["-", "artist_not_found.jpg"]
+        if top_artist is not None:
+            image = top_album.image
+            if image is not None and len(image) > 0:
+                image = self.cache.get_cache_path_from_url(image)
+                image = image.replace('\\', '/')
+            else:
+                image = "artist_not_found.jpg"
+                top_album_args = [top_album.name, image]
+
+        user_name = cmd_parse_result.lastfm_user.name
+        user_avatar = data.user_avatar
+        user_artist_count = cmd_parse_result.lastfm_user.artist_count
+        user_scrobbles = cmd_parse_result.lastfm_user.play_count
+        user_album_count = cmd_parse_result.lastfm_user.album_count
+
+        user_avatar = None
+
+        if data.user_avatar is not None:
+            if len(data.user_avatar) > 0:
+                data.user_avatar = data.user_avatar.replace('\\', '/')
+            else:
+                data.user_avatar = "-"
+        else:
+            data.user_avatar = "-"
+
+        user_avatar = data.user_avatar
+
+        if user_avatar == None or len(user_avatar) == 0:
+            user_avatar = "artist_not_found.jpg"
+
+        download_time = download_time_end - data.download_time_start
+        logging.info("Start rendering..")
+
+        render_start_time = time.time()
+        target_file = user_name + "_profile.png"
+        output_file = os.path.join(cef3d_output_path, target_file)
+        params = [ cef3d_user_profile_exe_path, os.path.join(cef3d_path, "assets", "profile.html"), output_file, str(user_top_artists_count), str(user_top_albums_count),
+                   ]
+
+        for arg in top_artist_args:
+            params.append(arg)
+
+        for arg in top_album_args:
+            params.append(arg)
+
+        params_2 = [user_name, str(user_artist_count), str(user_album_count), str(user_scrobbles), user_avatar, "tags"]
+        for arg in render_top_artists_args:
+            params_2.append(arg)
+
+        for arg in render_top_albums_args:
+            params_2.append(arg)
+
+        for arg in params_2:
+            params.append(arg)
+
+        try:
+            subprocess.run(params, timeout=15, stdout=subprocess.PIPE)
+        except Exception as ex:
+            logging.error("Subprocess crashed or timeout")
+            print(ex)
+            await self.client.safe_send_message(
+                    data.channel, "There was a problem with the request {}".format(self.client.emoji.FeelsMetalHead))
+
+            return
+
+        render_end_time = time.time()
+        render_time = (render_end_time - render_start_time)
+        logging.info("Cef3D stage took " + str(render_end_time - render_start_time))
+
 
     def parse_cmd_with_user(self,cmd, message, user_mentions):
         message_content = message.content
@@ -204,7 +428,7 @@ class Commands:
 
         download_time_start = time.time()
 
-        now_playing_entry = NowPlayingEntry(
+        now_playing_entry = DynamicDictEntry(
             now_playing_track = now_playing_track,
             recent_tracks = recent_tracks,
             user_avatar = user_avatar,
@@ -296,7 +520,7 @@ class Commands:
 
         render_start_time = time.time()
         target_file = user_name + ".png"
-        params = [cef3d_exe_path,  # target process
+        params = [cef3d_nowplaying_exe_path,  # target process
                   os.path.join(cef3d_path, "assets", "index.html"), os.path.join(cef3d_output_path, target_file),
                   # source html, target png
                   song_name, artist_name, album_cover, str(artist_scrobbles), str(album_scrobbles),

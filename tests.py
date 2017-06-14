@@ -21,11 +21,15 @@ class MockDiscordMember:
         self.id = id
         self.joined_at = join_date
 
+class MockDiscordChannel:
+    def __init__(self,id):
+        self.id = id
 
 class MockDiscordMessage:
-    def __init__(self, content, author):
+    def __init__(self, content, author, channel):
         self.content = content
         self.author = author
+        self.channel = channel
 
 class MockDiscordClient:
     async def get_user_info(self, user_id):
@@ -39,6 +43,7 @@ class TestCommands(unittest.TestCase):
         self.cmd.client = self.mock_client
 
         self.mock_author = MockDiscordMember(id="77509464290234368", join_date=datetime.datetime.now())
+        self.mock_channel = MockDiscordChannel(id="")
         self.cmd_prefix = self.cmd.prefix
 
 
@@ -98,6 +103,7 @@ class TestLogic(unittest.TestCase):
         self.cmd.client = self.mock_client
 
         self.mock_author = MockDiscordMember(id="77509464290234368", join_date=datetime.datetime.now())
+        self.mock_channel = MockDiscordChannel(id="")
         self.cmd_prefix = self.cmd.prefix
 
     def test_cmd_nowplaying(self):
@@ -119,6 +125,18 @@ class TestLogic(unittest.TestCase):
 
             message = MockDiscordMessage(content=cmd_text, author=self.mock_author)
             task = self.cmd.cmd_setlastfm(message=message)
+
+            tasks = [task]
+            tasks = asyncio.gather(*tasks)
+            result = loop.run_until_complete(tasks)
+
+    def test_cmd_lastfm(self):
+        with closing(asyncio.get_event_loop()) as loop:
+            cmd = "lastfm"
+            cmd_text = "{}{} arkenthera".format(self.cmd_prefix, cmd)
+
+            message = MockDiscordMessage(content=cmd_text, author=self.mock_author, channel=self.mock_channel)
+            task = self.cmd.cmd_lastfm(message=message, user_mentions=[])
 
             tasks = [task]
             tasks = asyncio.gather(*tasks)

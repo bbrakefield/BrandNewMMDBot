@@ -50,3 +50,16 @@ class LastFmWrapper:
         except:
             return 0
 
+
+    def get_user_artists(self, user_name, limit=None):
+        try:
+            return self.api.get_user_artists(user_name,limit)
+        except:
+            return None
+
+    def get_user_albums(self, user_name, limit=None):
+        try:
+            return self.api.get_user_albums(user_name, limit)
+        except:
+            return None
+

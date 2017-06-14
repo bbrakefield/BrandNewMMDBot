@@ -1,0 +1,192 @@
+body {
+    margin: 0;
+    font-family: 'Roboto', sans-serif;
+    overflow: hidden;
+    color: white;
+}
+.profile-container {
+    display: flex;
+    height: 900px
+}
+
+.left-panel-container {
+    display: flex;
+    background-image: url("artist_not_found.jpg"), url("artist_not_found.jpg"), url("artist_not_found.jpg"), url("artist_not_found.jpg"), url("artist_not_found.jpg"), url("artist_not_found.jpg");
+    background-size: 50%;
+    background-repeat: repeat;
+}
+
+.left-panel {
+    width: 600px;
+    height: 100%;
+}
+
+.artists-container {
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+}
+
+.top-artist {
+    height: 420px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    background-color: rgba(50,50,50,0.4);
+    backdrop-filter: blur(10px);
+}
+.top-artist-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.top-artist-cover {
+    background-image: url("artist_not_found.jpg");
+    background-size:100%;
+    width: 320px;
+    height: 320px;
+}
+
+.top-artist-text {
+    text-align: center;
+    font-size: 24px;
+}
+
+.artists {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    background-color: rgba(50,50,50,0.8);
+    backdrop-filter: blur(10px);
+    height: 480px;
+}
+
+.artist-item {
+    padding-top: 20px;
+    padding-left: 20px;
+}
+
+.item-artist-cover {
+    width: 170px;
+    height: 170px;
+    background-size:100%;
+}
+
+.item-artist-text {
+    text-align: center;
+}
+
+.right-panel {
+    width: 600px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.right-panel-container {
+    display: flex;
+    background-size: 10%;
+}
+
+.user-panel {
+    display: flex;
+    padding-top: 20px;
+    height: 205px;
+    width: 100%;
+    background-color: rgba(50,50,50,0.8);
+    backdrop-filter: blur(10px);
+}
+
+.user-avatar {
+    width: 200px;
+    height: 200px;
+    background-size: 100%;
+}
+
+.user-text {
+    font-size: 24px;
+    padding-top: 10px;
+    padding-left: 10px
+}
+
+.user-panel-container {
+    display: flex;
+}
+
+.user-info-panel {
+    display: flex;
+    flex-direction: column;
+}
+
+.user-info-panel-item-container {
+    display: flex;
+
+    padding-top: 25px;
+}
+.user-info-panel-item-container > .item {
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.albums-container {
+    height: 630px;
+}
+
+.top-album {
+    height: 300px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    background-color: rgba(50,50,50,0.8);
+    backdrop-filter: blur(10px);
+}
+.top-album-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.top-album-cover {
+    background-image: url("artist_not_found.jpg");
+    background-size:100%;
+    width: 250px;
+    height: 250px;
+}
+
+.top-album-text {
+    text-align: center;
+    font-size: 18px;
+}
+
+
+.albums {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    background-color: rgba(50,50,50,0.8);
+    backdrop-filter: blur(10px);
+    height: 330px;
+}
+
+.album-item {
+    padding-top: 15px;
+    padding-left: 15px;
+}
+
+.item-album-cover {
+    width: 120px;
+    height: 120px;
+    background-size:100%;
+}
+
+.item-album-text {
+    text-align: center;
+}
+
+.tags {
+    height: 45px;
+    background-color: rgba(50,50,50,0.8)
+}
+
+.tags-text {
+    text-align: left;
+}

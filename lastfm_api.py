@@ -99,8 +99,9 @@ class LastfmAPI:
 
                 # Parse this page
                 artists = self.parse_artist_page(parsed_json)
+                meta.artists = artists
 
-                if limit is not 1:
+                if limit is not 1 and len(artists) < limit:
                     for i in range(total_pages+1):
                         if i == 1 or i == 0:
                             continue
@@ -153,8 +154,9 @@ class LastfmAPI:
 
                 # Parse this page
                 albums = self.parse_album_page(parsed_json)
+                meta.albums = albums
 
-                if limit is not 1:
+                if limit is not 1 and len(albums) < limit:
                     for i in range(total_pages+1):
                         if i == 1 or i == 0:
                             continue
@@ -329,11 +331,11 @@ class LastfmAPI:
                     img_count = len(artist['image'])
                     image = ""
                     try:
-                        image = artist['image'][3]
+                        image = artist['image'][3]["#text"]
                     except:
                         logging.error("Defaulting to non-biggest album image")
                         for i in range(img_count):
-                            image = artist['image'][i]
+                            image = artist['image'][i]["#text"]
 
 
                     artist_inst = LastfmAPIArtist(name,playcount,url,image,0)
@@ -376,11 +378,11 @@ class LastfmAPI:
                     img_count = len(album['image'])
                     image = ""
                     try:
-                        image = album['image'][3]
+                        image = album['image'][3]["#text"]
                     except:
                         logging.error("Defaulting to non-biggest album image")
                         for i in range(img_count):
-                            image = album['image'][i]
+                            image = album['image'][i]["#text"]
 
                     artist = album['artist']
                     artist_name = artist['name']
