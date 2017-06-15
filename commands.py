@@ -157,14 +157,25 @@ class Commands:
         top_artist = None
         top_album = None
 
+        user_top_artists = []
+        user_top_albums = []
+
         if user_top_artists_count > 0:
             top_artist = user_artists[0]
 
         if user_top_albums_count > 0:
             top_album = user_albums[0]
 
+        for i in range(user_top_artists_count):
+            if i is not 0:
+                user_top_artists.append(user_artists[i])
+
+        for i in range(user_top_albums_count):
+            if i is not 0:
+                user_top_albums.append(user_albums[i])
+
         render_top_artists_args = []
-        for t_artist in user_artists:
+        for t_artist in user_top_artists:
             image = "artist_not_found.jpg"
 
             if self.cache.exists_in_cache(url2filename(t_artist.image)):
@@ -175,7 +186,7 @@ class Commands:
             render_top_artists_args.append(image)
 
         render_top_albums_args = []
-        for t_album in user_albums:
+        for t_album in user_top_albums:
             image = "artist_not_found.jpg"
 
             if self.cache.exists_in_cache(url2filename(t_album.image)):
@@ -196,14 +207,14 @@ class Commands:
             top_artist_args = [top_artist.name, image]
 
         top_album_args = ["-", "artist_not_found.jpg"]
-        if top_artist is not None:
+        if top_album is not None:
             image = top_album.image
             if image is not None and len(image) > 0:
                 image = self.cache.get_cache_path_from_url(image)
                 image = image.replace('\\', '/')
             else:
                 image = "artist_not_found.jpg"
-                top_album_args = [top_album.name, image]
+            top_album_args = [top_album.name, image]
 
         user_name = cmd_parse_result.lastfm_user.name
         user_avatar = data.user_avatar
@@ -232,7 +243,7 @@ class Commands:
         render_start_time = time.time()
         target_file = user_name + "_profile.png"
         output_file = os.path.join(cef3d_output_path, target_file)
-        params = [ cef3d_user_profile_exe_path, os.path.join(cef3d_path, "assets", "profile.html"), output_file, str(user_top_artists_count), str(user_top_albums_count),
+        params = [ cef3d_user_profile_exe_path, os.path.join(cef3d_path, "assets", "profile.html"), output_file, str(user_top_artists_count-1), str(user_top_albums_count-1),
                    ]
 
         for arg in top_artist_args:

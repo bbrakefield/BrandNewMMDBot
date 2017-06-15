@@ -11,9 +11,8 @@ body {
 
 .left-panel-container {
     display: flex;
-    background-image: url("artist_not_found.jpg"), url("artist_not_found.jpg"), url("artist_not_found.jpg"), url("artist_not_found.jpg"), url("artist_not_found.jpg"), url("artist_not_found.jpg");
-    background-size: 50%;
-    background-repeat: repeat;
+    background-image: url("artist_not_found.jpg");
+    background-size: 100%;
 }
 
 .left-panel {
@@ -38,6 +37,7 @@ body {
 .top-artist-container {
     display: flex;
     flex-direction: column;
+    padding-top : 25px;
 }
 
 .top-artist-cover {
@@ -85,7 +85,7 @@ body {
 
 .right-panel-container {
     display: flex;
-    background-size: 10%;
+    background-size: 100%;
 }
 
 .user-panel {
@@ -101,6 +101,7 @@ body {
     width: 200px;
     height: 200px;
     background-size: 100%;
+    background-repeat: no-repeat;
 }
 
 .user-text {
@@ -139,6 +140,11 @@ body {
     justify-content: center;
     background-color: rgba(50,50,50,0.8);
     backdrop-filter: blur(10px);
+}
+
+.top-album-title {
+    font-size: 28px;
+    text-align: center;
 }
 .top-album-container {
     display: flex;
@@ -189,4 +195,5 @@ body {
 
 .tags-text {
     text-align: left;
+    backdrop-filter: blur(10px);
 }

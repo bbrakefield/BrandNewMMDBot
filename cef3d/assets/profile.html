@@ -76,6 +76,9 @@
                         <div class="top-album-text" id="topAlbumText">
                             Shadows of the Dying Sun
                         </div>
+                        <div class="top-album-title">
+                            Top Albums
+                        </div>
                     </div>
                 </div>
                 <div class="albums" id="idAlbums">
@@ -125,10 +128,10 @@
         window.cppTags = "";
 
     if(!window.cppArtistCount)
-        window.cppArtistCount = 0;
+        window.cppArtistCount = 4;
 
     if(!window.cppAlbumCount)
-        window.cppAlbumCount = 0;
+        window.cppAlbumCount = 4;
 
     var repeating_albums = [];
     var repeating_artists = [];
@@ -156,9 +159,9 @@
 
 
     function set() {
-        document.getElementById("topArtistCover").style = "background-image: url('" + cppTopArtistCover + "');";
-        document.getElementById("topAlbumCover").style = "background-image: url('" + cppTopAlbumCover + "');";
-        document.getElementById("userAvatar").style = "background-image: url('" + cppUserAvatar + "');";
+        document.getElementById("topArtistCover").style = "background-image: url('" + window.cppTopArtistCover + "');";
+        document.getElementById("topAlbumCover").style = "background-image: url('" + window.cppTopAlbumCover + "');";
+        document.getElementById("userAvatar").style = "background-image: url('" + window.cppUserAvatar + "');";
 
         document.getElementById("topArtistText").innerText = window.cppTopArtistText;
         document.getElementById("topAlbumText").innerText = window.cppTopAlbumText;
@@ -181,24 +184,14 @@
             createTopArtist({ image: image, text: text})
         }
 
-        var repeating_album_bgs = "background-image: ";
-        for(var i = 0; i < repeating_albums.length; i++) {
-            repeating_album_bgs += "url('" + repeating_albums[i] + "'), ";
-        }
+        if(repeating_artists.length == 0)
+            repeating_artists[0] = "artist_not_found.jpg"
 
-        repeating_album_bgs = repeating_album_bgs.substring(0, repeating_album_bgs.length - 2);
-        repeating_album_bgs += ";";
+        if(repeating_albums.length == 0)
+            repeating_albums[0] = "artist_not_found.jpg"
 
-        var repeating_artist_bgs = "background-image: ";
-        for(var i = 0; i < repeating_artists.length; i++) {
-            repeating_artist_bgs += "url('" + repeating_artists[i] + "'), ";
-        }
-
-        repeating_artist_bgs = repeating_artist_bgs.substring(0, repeating_artist_bgs.length - 2);
-        repeating_artist_bgs += ";";
-
-        console.log(repeating_album_bgs);
-        console.log(repeating_artist_bgs);
+        var repeating_artist_bgs = "background-image: url('" + repeating_artists[0] + "')";
+        var repeating_album_bgs = "background-image: url('" + repeating_albums[0] + "')";
 
         document.getElementById("rightPanelContainer").style = repeating_album_bgs;
         document.getElementById("leftPanelContainer").style = repeating_artist_bgs;
