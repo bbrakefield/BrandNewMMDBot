@@ -36,6 +36,15 @@ class MockDiscordClient:
         return MockDiscordUser(user_id, "https://lastfm-img2.akamaized.net/i/u/300x300/59b6d6afd9a2462f85060f6c32def3f9.png", False, datetime.datetime.now(), 2345, "arkenthera", "arkenthera", datetime.datetime.now())
 
 
+class LastfmAPITest(unittest.TestCase):
+    def setUp(self):
+        self.api = LastfmAPI()
+
+    def test_get_tags(self):
+        tags = self.api.get_user_tags("arkenthera")
+
+
+
 class TestCommands(unittest.TestCase):
     def setUp(self):
         self.mock_client = MockDiscordClient()

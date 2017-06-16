@@ -68,11 +68,6 @@
                             </div>
                         </div>
                     </div>
-                    <div class="tags">
-                        <div class="tags-text" id="tagsText">
-                            Tags...
-                        </div>
-                    </div>
                 </div>
             </div>
             <div class="albums-container">
@@ -173,17 +168,19 @@
         document.getElementById("userArtists").innerText = window.cppUserArtists;
         document.getElementById("userName").innerText = window.cppUserName;
         document.getElementById("userAlbums").innerText = window.cppUserAlbums;
-        document.getElementById("tagsText").innerText = window.cppTags;
+        //document.getElementById("tagsText").innerText = window.cppTags;
 
         for(var i = 0; i < window.cppAlbumCount; i++) {
             text = window["cppTopAlbum_" + i + "_Text"];
             image = window["cppTopAlbum_" + i + "_Cover"];
+            //image = "artist_not_found.jpg";
             createTopAlbum({ image: image, text: text });
         }
 
         for(var i = 0; i < window.cppArtistCount; i++) {
             text = window["cppTopArtist_" + i + "_Text"];
             image = window["cppTopArtist_" + i + "_Cover"];
+            //image = "artist_not_found.jpg";
             createTopArtist({ image: image, text: text})
         }
 

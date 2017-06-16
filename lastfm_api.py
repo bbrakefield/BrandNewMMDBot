@@ -35,6 +35,11 @@ class LastfmAPITrack:
         self.is_nowplaying = is_nowplaying
         self.title = title
 
+class LastfmAPIUserTag:
+    def __init__(self, name, count):
+        self.name = name
+        self.count = count
+
 class LastfmAPIUser:
     def __init__(self, name, image, playlist_count, scrobbles, registered):
         self.name = name
@@ -486,4 +491,61 @@ class LastfmAPI:
                     return LastfmAPIUser(name, image, playlist_count, playcount, registered)
 
         except:
+            return None
+
+    def get_user_tags(self, user_name):
+        try:
+            request = self.make_request(method="user.getTopTags", user=user_name)
+
+            if request is None:
+                return None
+
+            top_tags = request["toptags"]["tag"]
+
+            tags = []
+
+            for top_tag in top_tags:
+                name = top_tag["name"]
+                count = top_tag["count"]
+
+                tag_obj = LastfmAPIUserTag(name, count)
+                tags.append(tag_obj)
+
+            return tags
+        except:
+            return None
+
+    def make_request(self, **params):
+        try:
+            url = "http://ws.audioscrobbler.com/2.0/?api_key={}&".format(API_KEY)
+
+            for name, value in params.items():
+                url += "{}={}&".format(name,value)
+
+            url += "format=json"
+
+            req = requests.get(url)
+
+            if req.status_code == 200:
+                content = req.text
+                parsed_json = json.loads(content)
+                error = None
+
+                try:
+                    error = parsed_json['error']
+                except:
+                    pass
+                if error is not None:
+                    logging.error("Last.fm API error")
+                    logging.error(parsed_json)
+                    return None
+
+                return parsed_json
+            else:
+                logging.error("Request error. Status code: {}".format(req.status_code))
+                return None
+
+        except Exception as ex:
+            logging.error("Unknown error")
+            logging.error(ex)
             return None

@@ -63,3 +63,8 @@ class LastFmWrapper:
         except:
             return None
 
+    def get_user_tags(self, user_name):
+        try:
+            return self.api.get_user_tags(user_name)
+        except:
+            return None

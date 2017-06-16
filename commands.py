@@ -125,6 +125,12 @@ class Commands:
         if user_avatar is not None and result.cmd_mode == 2:
             user_avatar = self.cache.get_cache_path_from_url(user_avatar)
 
+        # Tags
+        tags = self.lastfm.get_user_tags(result.lastfm_user_name)
+
+        if tags is None:
+            tags = []
+
         api_time_end = time.time()
         api_time = api_time_end - api_time_start
 
@@ -138,7 +144,8 @@ class Commands:
             channel=message.channel,
             send_stats=stats,
             api_time=api_time,
-            download_time_start=download_time_start
+            download_time_start=download_time_start,
+            tags = tags
         )
         if len(files_to_download) > 0:
             parallel_downloader = ParallelDownloader(files_to_download, download_cache, entry,
@@ -224,6 +231,7 @@ class Commands:
         user_artist_count = cmd_parse_result.lastfm_user.artist_count
         user_scrobbles = cmd_parse_result.lastfm_user.play_count
         user_album_count = cmd_parse_result.lastfm_user.album_count
+        tags_text = ""
 
         user_avatar = None
 
@@ -240,6 +248,10 @@ class Commands:
         if user_avatar == None or len(user_avatar) == 0:
             user_avatar = "artist_not_found.jpg"
 
+        if len(data.tags) > 0:
+            for tag in data.tags:
+                tags_text += "{},".format(tag.name)
+
         download_time = download_time_end - data.download_time_start
         logging.info("Start rendering..")
 
@@ -255,7 +267,7 @@ class Commands:
         for arg in top_album_args:
             params.append(arg)
 
-        params_2 = [user_name, str(user_artist_count), str(user_album_count), str(user_scrobbles), user_avatar, "tags"]
+        params_2 = [user_name, str(user_artist_count), str(user_album_count), str(user_scrobbles), user_avatar, tags_text]
         for arg in render_top_artists_args:
             params_2.append(arg)
 

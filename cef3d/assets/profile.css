@@ -12,7 +12,7 @@ body {
 }
 .profile-container {
     display: flex;
-    height: 900px
+    height: 970px
 }
 
 .left-panel-container {
@@ -24,14 +24,14 @@ body {
 .left-panel {
     width: 600px;
     height: 100%;
-    background-color: rgba(5,5,5,0.5);
+    background-color: rgba(5,5,5,0.4);
+    backdrop-filter: blur(10px);
 }
 
 .artists-container {
     display: flex;
     height: 100%;
     flex-direction: column;
-    backdrop-filter: blur(10px);
 }
 
 .top-artist {
@@ -62,12 +62,12 @@ body {
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
-    backdrop-filter: blur(10px);
     height: 480px;
 }
 
 .artist-item {
-    padding-left: 20px;
+    margin: 0;
+    padding: 25px;
     width: 150px;
 }
 
@@ -81,6 +81,7 @@ body {
     text-align: center;
     text-overflow: ellipsis;
     overflow: hidden;
+    height: 30px;
 }
 
 .right-panel {
@@ -89,12 +90,12 @@ body {
     display: flex;
     flex-direction: column;
     backdrop-filter: blur(10px);
+    background-color: rgba(45,45,45,0.4);
 }
 
 .right-panel-container {
     display: flex;
     background-size: 100%;
-    background-color: rgba(5,5,5,0.5);
 }
 
 .user-panel {
@@ -191,13 +192,14 @@ body {
 
 .album-item {
     /*padding-top: 15px;*/
-    padding-left: 15px;
+    padding: 12px;
+    margin: 0;
     width: 150px;
 }
 
 .item-album-cover {
-    width: 120px;
-    height: 120px;
+    width: 150px;
+    height: 150px;
     background-size:100%;
 }
 
@@ -205,6 +207,7 @@ body {
     text-align: center;
     text-overflow: ellipsis;
     overflow: hidden;
+    height: 20px;
 }
 
 .tags {
