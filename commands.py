@@ -259,33 +259,26 @@ class Commands:
         target_file = user_name + "_profile.png"
         output_file = os.path.join(cef3d_output_path, target_file)
         params = [ cef3d_user_profile_exe_path, os.path.join(cef3d_path, "assets", "profile.html"), output_file, str(user_top_artists_count-1), str(user_top_albums_count-1),
-                   ]
+                   *top_artist_args, *top_album_args]
 
-        for arg in top_artist_args:
-            params.append(arg)
 
-        for arg in top_album_args:
-            params.append(arg)
+        params_2 = [user_name, str(user_artist_count), str(user_album_count), str(user_scrobbles), user_avatar, tags_text,
+                    *render_top_artists_args, *render_top_albums_args]
 
-        params_2 = [user_name, str(user_artist_count), str(user_album_count), str(user_scrobbles), user_avatar, tags_text]
-        for arg in render_top_artists_args:
-            params_2.append(arg)
-
-        for arg in render_top_albums_args:
-            params_2.append(arg)
 
         for arg in params_2:
             params.append(arg)
 
+        crashed = False
+
         try:
-            subprocess.run(params, timeout=15, stdout=subprocess.PIPE)
+            subprocess.run(params, timeout=4, stdout=subprocess.PIPE)
         except Exception as ex:
             logging.error("Subprocess crashed or timeout")
             print(ex)
+            crashed = True
             await self.client.safe_send_message(
                     data.channel, "There was a problem with the request {}".format(self.client.emoji.FeelsMetalHead))
-
-            return
 
         render_end_time = time.time()
         render_time = (render_end_time - render_start_time)
@@ -297,15 +290,23 @@ class Commands:
             stats = "Last.fm API: **{:0.2f}** seconds\nDownloading: **{:0.2f}** seconds\nRendering: **{:0.2f}** seconds".format(
                 (data.api_time), (download_time), (render_time))
 
-        with open(output_file, 'rb') as f:
-            try:
-                if data.send_stats:
-                    await self.client.send_file(data.channel, f, content=stats)
-                else:
-                    await self.client.send_file(data.channel, f)
-            except Exception as error:
-                logging.error("Error while trying to upload the file to Discord")
-                logging.error(error)
+        can_continue = False
+        if os.path.isfile(output_file):
+            can_continue = True
+
+        if crashed:
+            stats += "\nProcess has crashed."
+
+        if can_continue:
+            with open(output_file, 'rb') as f:
+                try:
+                    if data.send_stats:
+                        await self.client.send_file(data.channel, f, content=stats)
+                    else:
+                        await self.client.send_file(data.channel, f)
+                except Exception as error:
+                    logging.error("Error while trying to upload the file to Discord")
+                    logging.error(error)
 
 
     def parse_cmd_with_user(self,cmd, message, user_mentions):
