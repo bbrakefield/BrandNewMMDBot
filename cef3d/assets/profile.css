@@ -24,7 +24,7 @@ body {
 .left-panel {
     width: 600px;
     height: 100%;
-    background-color: rgba(5,5,5,0.4);
+    background-color: rgba(5,5,5,0.6);
     backdrop-filter: blur(10px);
 }
 
@@ -90,7 +90,7 @@ body {
     display: flex;
     flex-direction: column;
     backdrop-filter: blur(10px);
-    background-color: rgba(45,45,45,0.4);
+    background-color: rgba(0,0,0,0.7);
 }
 
 .right-panel-container {

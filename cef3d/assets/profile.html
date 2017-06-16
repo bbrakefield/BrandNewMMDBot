@@ -183,18 +183,18 @@
             //image = "artist_not_found.jpg";
             createTopArtist({ image: image, text: text})
         }
+        var random_artist_cover = "artist_not_found.jpg";
+        if(repeating_artists.length !== 0)
+            random_artist_cover = repeating_artists[Math.floor(Math.random() * repeating_artists.length)]
 
-        if(repeating_artists.length == 0)
-            repeating_artists[0] = "artist_not_found.jpg"
+        if(repeating_albums.length !== 0)
+            random_album_cover = repeating_albums[Math.floor(Math.random() * repeating_albums.length)]
 
-        if(repeating_albums.length == 0)
-            repeating_albums[0] = "artist_not_found.jpg"
+        var repeating_artist_bgs = "background-image: url('" + random_artist_cover + "')";
+        var repeating_album_bgs = "background-image: url('" + random_album_cover + "')";
 
-        var repeating_artist_bgs = "background-image: url('" + cppTopAlbumCover + "')";
-        var repeating_album_bgs = "background-image: url('" + cppTopArtistCover + "')";
-
-        document.getElementById("rightPanelContainer").style = repeating_artist_bgs;
-        document.getElementById("leftPanelContainer").style = repeating_album_bgs;
+        document.getElementById("rightPanelContainer").style = repeating_album_bgs;
+        document.getElementById("leftPanelContainer").style = repeating_artist_bgs;
     }
     set();
 
