@@ -277,8 +277,6 @@ class Commands:
             logging.error("Subprocess crashed or timeout")
             print(ex)
             crashed = True
-            await self.client.safe_send_message(
-                    data.channel, "There was a problem with the request {}".format(self.client.emoji.FeelsMetalHead))
 
         render_end_time = time.time()
         render_time = (render_end_time - render_start_time)
@@ -296,6 +294,11 @@ class Commands:
 
         if crashed:
             stats += "\nProcess has crashed."
+
+        if crashed and can_continue is False:
+            await self.client.safe_send_message(
+                data.channel, "There was a problem with the request {}".format(self.client.emoji.FeelsMetalHead))
+            return
 
         if can_continue:
             with open(output_file, 'rb') as f:
@@ -562,7 +565,7 @@ class Commands:
         logging.info("Start rendering..")
 
         render_start_time = time.time()
-        target_file = user_name + ".png"
+        target_file = user_name + "_np.png"
         params = [cef3d_nowplaying_exe_path,  # target process
                   os.path.join(cef3d_path, "assets", "index.html"), os.path.join(cef3d_output_path, target_file),
                   # source html, target png
