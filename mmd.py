@@ -49,6 +49,13 @@ class MusicBot(discord.Client):
         if not response == None:
             return response
 
+    async def cmd_lastfmstats(self, message, user_mentions):
+        await self.send_typing(message.channel)
+
+        response = await self.commands.cmd_lastfm(message,user_mentions, True)
+        if not response == None:
+            return response
+
     async def cmd_npstats(self, message, user_mentions):
         await self.send_typing(message.channel)
 

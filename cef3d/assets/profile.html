@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+    <link href="google_roboto.css" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="profile.css">
 </head>
 <body>
@@ -20,6 +20,9 @@
                             Insomnium
                         </div>
                     </div>
+                </div>
+                <div class="top-artist-title">
+                    Top Artists
                 </div>
                 <div class="artists" id="idArtists">
 
@@ -65,6 +68,11 @@
                             </div>
                         </div>
                     </div>
+                    <div class="tags">
+                        <div class="tags-text" id="tagsText">
+                            Tags...
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="albums-container">
@@ -76,18 +84,13 @@
                         <div class="top-album-text" id="topAlbumText">
                             Shadows of the Dying Sun
                         </div>
-                        <div class="top-album-title">
-                            Top Albums
-                        </div>
                     </div>
+                </div>
+                <div class="top-album-title">
+                    Top Albums
                 </div>
                 <div class="albums" id="idAlbums">
 
-                </div>
-                <div class="tags">
-                    <div class="tags-text" id="tagsText">
-                        Tags...
-                    </div>
                 </div>
             </div>
         </div>
@@ -125,7 +128,7 @@
         window.cppUserName = "-";
 
     if(!window.cppTags)
-        window.cppTags = "";
+        window.cppTags = "melodeath, bleg, melodeath, bleg, melodeath, bleg, melodeath, bleg, melodeath, bleg, melodeath, bleg, melodeath, bleg, ";
 
     if(!window.cppArtistCount)
         window.cppArtistCount = 4;
@@ -190,11 +193,11 @@
         if(repeating_albums.length == 0)
             repeating_albums[0] = "artist_not_found.jpg"
 
-        var repeating_artist_bgs = "background-image: url('" + repeating_artists[0] + "')";
-        var repeating_album_bgs = "background-image: url('" + repeating_albums[0] + "')";
+        var repeating_artist_bgs = "background-image: url('" + cppTopAlbumCover + "')";
+        var repeating_album_bgs = "background-image: url('" + cppTopArtistCover + "')";
 
-        document.getElementById("rightPanelContainer").style = repeating_album_bgs;
-        document.getElementById("leftPanelContainer").style = repeating_artist_bgs;
+        document.getElementById("rightPanelContainer").style = repeating_artist_bgs;
+        document.getElementById("leftPanelContainer").style = repeating_album_bgs;
     }
     set();
 

@@ -122,6 +122,9 @@ class Commands:
                     pass
                 pass
 
+        if user_avatar is not None and result.cmd_mode == 2:
+            user_avatar = self.cache.get_cache_path_from_url(user_avatar)
+
         api_time_end = time.time()
         api_time = api_time_end - api_time_start
 
@@ -275,6 +278,22 @@ class Commands:
         render_end_time = time.time()
         render_time = (render_end_time - render_start_time)
         logging.info("Cef3D stage took " + str(render_end_time - render_start_time))
+
+        if urls is not None and len(urls) > 0:
+            stats = "Last.fm API: **{:0.2f}** seconds\nDownloading: **{:0.2f}** seconds (**{}** items)\nRendering: **{:0.2f}** seconds".format((data.api_time), (download_time), len(urls), (render_time))
+        else:
+            stats = "Last.fm API: **{:0.2f}** seconds\nDownloading: **{:0.2f}** seconds\nRendering: **{:0.2f}** seconds".format(
+                (data.api_time), (download_time), (render_time))
+
+        with open(output_file, 'rb') as f:
+            try:
+                if data.send_stats:
+                    await self.client.send_file(data.channel, f, content=stats)
+                else:
+                    await self.client.send_file(data.channel, f)
+            except Exception as error:
+                logging.error("Error while trying to upload the file to Discord")
+                logging.error(error)
 
 
     def parse_cmd_with_user(self,cmd, message, user_mentions):
