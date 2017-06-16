@@ -462,7 +462,7 @@ class Commands:
         # Check covers for 'recent tracks'
         for r_track in recent_tracks:
             if len(r_track.image) > 0:
-                if r_track.image is not None and self.cache.exists_in_cache(url2filename(r_track.image)) is False:
+                if r_track.image is not None and self.cache.exists_in_cache(url2filename(r_track.image)) is False and not r_track.image in files_to_download:
                     files_to_download.append(r_track.image)
 
 
