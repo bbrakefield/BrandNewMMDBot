@@ -130,7 +130,7 @@ body {
 .user-info-panel-item-container {
     display: flex;
 
-    padding-top: 25px;
+    padding-top: 10px;
 }
 .user-info-panel-item-container > .item {
     padding-left: 10px;
@@ -140,6 +140,10 @@ body {
 .item-upper {
     font-weight: 400;
     color: darkgrey;
+    font-size: 26px;
+}
+.item-lower {
+    font-size: 22px;
 }
 
 .albums-container {
